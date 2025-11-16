@@ -169,11 +169,13 @@
                             <span class="text-blue-600 font-semibold text-sm">4</span>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900">Lampiran Dokumen</h3>
-                        <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">Opsional</span>
+                        <!-- PERUBAHAN: Mengubah badge opsional menjadi wajib -->
+                        <span class="text-sm text-red-600 bg-red-100 px-2 py-1 rounded font-medium">Wajib</span>
                     </div>
 
                     <div class="space-y-2">
                         <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors duration-200">
+                            <!-- PERUBAHAN: Menambahkan atribut required (tapi tetap perlu validasi server) -->
                             <input type="file" name="attachment" id="attachment" class="hidden">
                             <label for="attachment" class="cursor-pointer">
                                 <div class="space-y-3">
@@ -197,9 +199,10 @@
                                 <div class="text-sm text-blue-800">
                                     <p class="font-medium">Informasi Lampiran:</p>
                                     <ul class="mt-1 space-y-1">
+                                        <!-- PERUBAHAN: Menegaskan bahwa bukti wajib diupload -->
+                                        <li class="font-semibold text-blue-900">• Wajib melampirkan bukti (Surat Dokter/Keterangan)</li>
                                         <li>• Format yang diterima: JPG, PNG, PDF</li>
                                         <li>• Ukuran maksimal: 2MB</li>
-                                        <li>• Contoh: Surat dokter, surat keterangan, dll.</li>
                                     </ul>
                                 </div>
                             </div>

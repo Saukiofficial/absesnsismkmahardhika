@@ -37,7 +37,8 @@
     </div>
 
     <!-- Statistik Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Ubah grid menjadi 5 kolom di layar besar agar muat semua kartu -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <!-- Total Siswa -->
         <div class="relative bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
             <div class="absolute top-4 right-4">
@@ -79,6 +80,48 @@
             </div>
         </div>
 
+        <!-- Izin Hari Ini -->
+        <div class="relative bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+            <div class="absolute top-4 right-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wide">Izin Hari Ini</h3>
+                <p class="text-3xl font-bold text-orange-500 mt-2">{{ $izinHariIni ?? 0 }}</p>
+            </div>
+            <div class="flex items-center text-sm text-orange-500">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="font-medium">Terkonfirmasi</span>
+            </div>
+        </div>
+
+        <!-- Terlambat -->
+        <div class="relative bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+            <div class="absolute top-4 right-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wide">Terlambat</h3>
+                <p class="text-3xl font-bold text-yellow-600 mt-2">{{ $lateCount }}</p>
+            </div>
+            <div class="flex items-center text-sm text-yellow-600">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="font-medium">Perlu Dipantau</span>
+            </div>
+        </div>
+
         <!-- Belum Hadir -->
         <div class="relative bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
             <div class="absolute top-4 right-4">
@@ -99,143 +142,144 @@
                 <span class="font-medium">Perlu Perhatian</span>
             </div>
         </div>
-
-        <!-- Terlambat -->
-        <div class="relative bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
-            <div class="absolute top-4 right-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="mb-4">
-                <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wide">Terlambat</h3>
-                <p class="text-3xl font-bold text-yellow-600 mt-2">{{ $lateCount }}</p>
-            </div>
-            <div class="flex items-center text-sm text-yellow-600">
-                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                </svg>
-                <span class="font-medium">Perlu Dipantau</span>
-            </div>
-        </div>
     </div>
 
-    <!-- Aktivitas Absensi Terakhir -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-900">Aktivitas Absensi Terakhir</h3>
-                    <p class="text-gray-600 mt-1">Data kehadiran siswa terbaru</p>
+    <!-- Layout Split 2 Kolom: Aktivitas & Permintaan Izin -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- KOLOM KIRI: Aktivitas Absensi Terakhir -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">Aktivitas Absensi</h3>
+                        <p class="text-xs text-gray-600">Real-time update</p>
+                    </div>
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-sm text-gray-600 font-medium">Live Updates</span>
-                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Siswa</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Waktu</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        @forelse ($latestAttendances as $attendance)
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs mr-3">
+                                            {{ substr($attendance->user->name ?? 'N', 0, 1) }}
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">{{ Str::limit($attendance->user->name ?? 'N/A', 15) }}</div>
+                                            <div class="text-xs text-gray-500">{{ $attendance->user->class ?? '-' }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    @if($attendance->status == 'in')
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Masuk</span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">Pulang</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
+                                    {{ $attendance->recorded_at->format('H:i') }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="3" class="text-center py-4 text-sm text-gray-500">Belum ada data</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-800">
-                    <tr>
-                        <th scope="col" class="px-8 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                            <div class="flex items-center space-x-2">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span>Nama Siswa</span>
-                            </div>
-                        </th>
-                        <th scope="col" class="px-8 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                            <div class="flex items-center space-x-2">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 0a1 1 0 100 2h.01a1 1 0 100-2H9z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span>Kelas</span>
-                            </div>
-                        </th>
-                        <th scope="col" class="px-8 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                            <div class="flex items-center space-x-2">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span>Status</span>
-                            </div>
-                        </th>
-                        <th scope="col" class="px-8 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                            <div class="flex items-center space-x-2">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span>Waktu</span>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-100">
-                    @forelse ($latestAttendances as $index => $attendance)
-                        <tr class="hover:bg-gray-50 transition-colors duration-200 {{ $index % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
-                            <td class="px-8 py-6 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-12 w-12">
-                                        <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                                            <span class="text-white font-semibold text-lg">{{ substr($attendance->user->name ?? 'N', 0, 1) }}</span>
+        <!-- KOLOM KANAN: Permintaan Izin Baru (FITUR BARU) -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="bg-gradient-to-r from-orange-50 to-orange-100 px-6 py-4 border-b border-orange-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">Permintaan Izin Baru</h3>
+                        <p class="text-xs text-gray-600">Menunggu konfirmasi</p>
+                    </div>
+                    <div class="flex items-center justify-center min-w-[1.5rem] h-6 bg-orange-200 rounded-full text-orange-600 text-xs font-bold px-2">
+                        {{ isset($pendingPermissions) ? $pendingPermissions->count() : 0 }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Siswa</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ket</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        @forelse ($pendingPermissions ?? [] as $permission)
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xs mr-3">
+                                            {{ substr($permission->user->name ?? 'U', 0, 1) }}
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">{{ Str::limit($permission->user->name ?? 'N/A', 15) }}</div>
+                                            <div class="text-xs text-gray-500">{{ $permission->user->class ?? '-' }}</div>
                                         </div>
                                     </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-semibold text-gray-900">{{ $attendance->user->name ?? 'N/A' }}</div>
-                                        <div class="text-sm text-gray-500">ID: {{ $attendance->user->id ?? 'N/A' }}</div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="text-xs font-medium text-gray-900 uppercase">{{ $permission->type }}</div>
+                                    <div class="text-xs text-gray-500 truncate w-24" title="{{ $permission->reason }}">
+                                        {{ Str::limit($permission->reason, 20) }}
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-6 whitespace-nowrap">
-                                <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
-                                    {{ $attendance->user->class ?? 'N/A' }}
-                                </div>
-                            </td>
-                            <td class="px-8 py-6 whitespace-nowrap">
-                                @if($attendance->status == 'in')
-                                    <span class="inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-200">
-                                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
+                                    <div class="flex flex-col">
+                                        <span>{{ $permission->start_date->format('d M') }}</span>
+                                        @if($permission->start_date != $permission->end_date)
+                                            <span class="text-[10px] text-gray-400">s.d {{ $permission->end_date->format('d M') }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-6 py-8 text-center">
+                                    <div class="flex flex-col items-center justify-center text-gray-400">
+                                        <svg class="w-10 h-10 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
-                                        Masuk
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-200">
-                                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                        </svg>
-                                        Pulang
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-8 py-6 whitespace-nowrap text-sm text-gray-900">
-                                <div class="flex flex-col">
-                                    <span class="font-medium">{{ $attendance->recorded_at->format('d M Y') }}</span>
-                                    <span class="text-xs text-gray-500 mt-1">{{ $attendance->recorded_at->format('H:i:s') }}</span>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="px-8 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center">
-                                    <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                    </svg>
-                                    <h3 class="text-lg font-medium text-gray-900 mb-1">Belum ada data absensi</h3>
-                                    <p class="text-gray-500">Data kehadiran akan muncul setelah siswa melakukan absensi</p>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                                        <span class="text-sm">Tidak ada izin pending</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer Card dengan Link ke Halaman Full -->
+            @if(isset($pendingPermissions) && $pendingPermissions->count() > 0)
+            <div class="bg-gray-50 px-4 py-3 text-center border-t border-gray-100">
+                <!-- Ubah href ini ke route index permission Anda -->
+                <a href="#" class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+                    Lihat Semua Permintaan &rarr;
+                </a>
+            </div>
+            @endif
         </div>
+
     </div>
 
     <!-- Real-time Clock Script -->

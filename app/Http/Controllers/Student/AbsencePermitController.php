@@ -16,7 +16,6 @@ class AbsencePermitController extends Controller
      */
     public function index(): View
     {
-        // ... (kode fungsi index tidak berubah) ...
         $permits = Auth::user()->absencePermits()->latest()->paginate(10);
 
         return view('student.permits.index', [
@@ -26,12 +25,11 @@ class AbsencePermitController extends Controller
     }
 
     /**
-     * PERUBAHAN: Menampilkan detail satu pengajuan izin.
+     * Menampilkan detail satu pengajuan izin.
      */
     public function show(AbsencePermit $permit): View
     {
         // Keamanan: Pastikan siswa yang login adalah pemilik izin ini.
-        // Jika tidak, tampilkan halaman error 403 (Forbidden).
         abort_if(Auth::id() !== $permit->user_id, 403);
 
         return view('student.permits.show', [
@@ -45,7 +43,6 @@ class AbsencePermitController extends Controller
      */
     public function create(): View
     {
-        // ... (kode fungsi create tidak berubah) ...
         return view('student.permits.create', [
             'pageTitle' => 'Buat Pengajuan Izin'
         ]);
@@ -56,13 +53,12 @@ class AbsencePermitController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // ... (kode fungsi store tidak berubah) ...
         $validated = $request->validate([
             'permit_type' => 'required|in:sakit,izin',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'reason' => 'required|string|max:1000',
-            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'attachment' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -77,4 +73,3 @@ class AbsencePermitController extends Controller
         return redirect()->route('student.dashboard')->with('success', 'Pengajuan izin berhasil dikirim dan sedang menunggu persetujuan.');
     }
 }
-

@@ -102,6 +102,7 @@ class StudentController extends Controller
         $data = $request->except('password', 'photo', 'grade', 'major');
         $data['password'] = Hash::make($request->password);
         $data['role'] = 'siswa';
+        // Menggabungkan Grade dan Major menjadi satu string "class"
         $data['class'] = $request->grade . ' ' . $request->major;
 
         if ($request->hasFile('photo')) {
@@ -120,6 +121,23 @@ class StudentController extends Controller
     {
         $pageTitle = 'Edit Siswa: ' . $student->name;
         $guardians = User::query()->guardian()->orderBy('name')->get();
+
+        // --- PERBAIKAN LOGIKA UNTUK FORM EDIT ---
+        // Memecah string 'class' dan membersihkan spasi (trim)
+        // Agar "X  AKUNTANSI" (dobel spasi) tetap terbaca sebagai "X" dan "AKUNTANSI"
+        if ($student->class) {
+            // Limit 2 digunakan agar jurusan yang mengandung spasi tidak terpotong salah
+            $parts = explode(' ', $student->class, 2);
+
+            if (count($parts) === 2) {
+                $student->grade = trim($parts[0]); // Tambahkan trim()
+                $student->major = trim($parts[1]); // Tambahkan trim()
+            } elseif (count($parts) === 1) {
+                // Jaga-jaga jika formatnya salah (hanya kelas atau jurusan)
+                $student->grade = trim($parts[0]);
+            }
+        }
+
         return view('admin.students.form', array_merge(
             compact('pageTitle', 'student', 'guardians'),
             $this->getClassData()
@@ -146,6 +164,7 @@ class StudentController extends Controller
         ]);
 
         $data = $request->except('password', 'photo', 'grade', 'major');
+        // Menggabungkan kembali Grade dan Major saat update
         $data['class'] = $request->grade . ' ' . $request->major;
 
         if ($request->hasFile('photo')) {
@@ -176,4 +195,3 @@ class StudentController extends Controller
         return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil dihapus.');
     }
 }
-

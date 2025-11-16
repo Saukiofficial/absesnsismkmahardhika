@@ -1,52 +1,61 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use App\Models\AbsencePermit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
+use App\Models\AbsencePermit;
 
 class AbsencePermitController extends Controller
 {
-    /**
-     * Menampilkan daftar semua pengajuan izin dari siswa.
-     */
+
     public function index(): View
     {
-        $permits = AbsencePermit::with('student')->latest()->paginate(15);
-        $pageTitle = 'Manajemen Izin Absen';
-        return view('admin.permits.index', compact('pageTitle', 'permits'));
+        $permits = Auth::user()->absencePermits()->latest()->paginate(10);
+
+        return view('student.permits.index', [
+            'pageTitle' => 'Riwayat Pengajuan Izin',
+            'permits' => $permits,
+        ]);
     }
 
-    /**
-     * PERUBAHAN: Menampilkan halaman detail untuk satu pengajuan izin.
-     */
     public function show(AbsencePermit $permit): View
     {
-        $pageTitle = 'Detail Pengajuan Izin';
-        // Memuat relasi student untuk menampilkan data siswa di view
-        $permit->load('student');
-        return view('admin.permits.show', compact('pageTitle', 'permit'));
+        abort_if(Auth::id() !== $permit->user_id, 403);
+
+        return view('student.permits.show', [
+            'pageTitle' => 'Detail Pengajuan Izin',
+            'permit' => $permit,
+        ]);
     }
-
-    /**
-     * PERUBAHAN: Memperbarui status pengajuan izin (Setuju/Tolak).
-     */
-    public function updateStatus(Request $request, AbsencePermit $permit): RedirectResponse
+    public function create(): View
     {
-        $request->validate([
-            'status' => 'required|in:disetujui,ditolak',
+        return view('student.permits.create', [
+            'pageTitle' => 'Buat Pengajuan Izin'
+        ]);
+    }
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'permit_type' => 'required|in:sakit,izin',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'reason' => 'required|string|max:1000',
+            'attachment' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $permit->update([
-            'status' => $request->status,
-            'approved_by' => Auth::id(), // Menyimpan ID admin yang memproses
-        ]);
+        $validated['user_id'] = Auth::id();
 
-        return redirect()->route('admin.permits.index')->with('success', 'Status pengajuan izin berhasil diperbarui.');
+        if ($request->hasFile('attachment')) {
+            $path = $request->file('attachment')->store('attachments', 'public');
+            $validated['attachment'] = $path;
+        }
+
+        AbsencePermit::create($validated);
+
+        return redirect()->route('student.dashboard')->with('success', 'Pengajuan izin berhasil dikirim dan sedang menunggu persetujuan.');
     }
 }
-
