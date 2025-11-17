@@ -29,13 +29,15 @@ class NewAttendance implements ShouldBroadcast
      *
      * @param \App\Models\User $student
      * @param \App\Models\Attendance $attendance
+     * @param bool $isLate // PERUBAHAN 1: Menerima argumen $isLate
      */
-    public function __construct(User $student, Attendance $attendance)
+    public function __construct(User $student, Attendance $attendance, bool $isLate)
     {
         // Menentukan URL foto: gunakan foto asli jika ada, jika tidak, gunakan UI Avatars.
         $photoUrl = $student->photo
             ? Storage::url($student->photo)
-            : 'https://ui-avatars.com/api/?name=' . urlencode($student->name) . '&background=random&size=150';
+            // PERBAIKAN: Mengganti placeholder UI Avatars agar lebih konsisten
+            : 'https://placehold.co/128x128/0f0f23/64e5e5?text=' . substr($student->name, 0, 1);
 
         // Membangun data yang akan dikirim ke halaman monitor
         $this->attendanceData = [
@@ -44,6 +46,7 @@ class NewAttendance implements ShouldBroadcast
             'status' => $attendance->status,
             'time' => $attendance->recorded_at->format('H:i:s'),
             'photo_url' => $photoUrl,
+            'is_late' => $isLate, // PERUBAHAN 2: Menambahkan status terlambat ke data broadcast
         ];
     }
 
@@ -71,4 +74,3 @@ class NewAttendance implements ShouldBroadcast
         return 'new-attendance-event';
     }
 }
-

@@ -60,7 +60,17 @@
                                                 {{ strtoupper(substr($student->name, 0, 1)) }}
                                             </span>
                                         </div>
-                                        <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+                                        <!-- PERBAIKAN: Ganti ikon 'aktif' statis dengan status dinamis -->
+                                        @php
+                                            $statusIndicatorColor = 'bg-slate-400'; // Default
+                                            switch ($student->statusHariIni) {
+                                                case 'Hadir': $statusIndicatorColor = 'bg-green-500'; break;
+                                                case 'Terlambat': $statusIndicatorColor = 'bg-yellow-500'; break;
+                                                case 'Izin': $statusIndicatorColor = 'bg-blue-500'; break;
+                                                case 'Alpa': case 'Belum Absen': $statusIndicatorColor = 'bg-red-500'; break;
+                                            }
+                                        @endphp
+                                        <div class="absolute -bottom-1 -right-1 w-5 h-5 {{ $statusIndicatorColor }} rounded-full border-2 border-white shadow-sm"></div>
                                     </div>
 
                                     <!-- Student Info -->
@@ -81,11 +91,44 @@
 
                                 <!-- Action Indicators -->
                                 <div class="flex items-center space-x-4">
-                                    <!-- Status Badge -->
-                                    <div class="hidden sm:flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-full">
-                                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                        <span class="text-xs font-medium text-green-700">Aktif</span>
+
+                                    <!-- PERBAIKAN: Badge Status Real-time (Menggantikan 'Aktif') -->
+                                    @php
+                                        $statusColor = '';
+                                        $statusIcon = '';
+                                        $statusText = $student->statusHariIni;
+
+                                        switch ($statusText) {
+                                            case 'Hadir':
+                                                $statusColor = 'bg-green-100 text-green-800';
+                                                $statusIcon = '<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>';
+                                                break;
+                                            case 'Terlambat':
+                                                $statusColor = 'bg-yellow-100 text-yellow-800';
+                                                $statusIcon = '<div class="w-2 h-2 bg-yellow-500 rounded-full"></div>';
+                                                break;
+                                            case 'Izin':
+                                                $statusColor = 'bg-blue-100 text-blue-800';
+                                                $statusIcon = '<div class="w-2 h-2 bg-blue-500 rounded-full"></div>';
+                                                break;
+                                            case 'Alpa':
+                                            case 'Belum Absen':
+                                                $statusColor = 'bg-red-100 text-red-800';
+                                                $statusIcon = '<div class="w-2 h-2 bg-red-500 rounded-full"></div>';
+                                                break;
+                                            case 'Libur':
+                                            default:
+                                                $statusColor = 'bg-slate-100 text-slate-800';
+                                                $statusIcon = '<div class="w-2 h-2 bg-slate-500 rounded-full"></div>';
+                                                break;
+                                        }
+                                    @endphp
+
+                                    <div class="hidden sm:flex items-center space-x-2 {{ $statusColor }} px-3 py-1 rounded-full">
+                                        {!! $statusIcon !!}
+                                        <span class="text-xs font-medium">{{ $statusText }}</span>
                                     </div>
+                                    <!-- AKHIR PERUBAHAN -->
 
                                     <!-- Arrow -->
                                     <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-teal-50 transition-colors duration-200">

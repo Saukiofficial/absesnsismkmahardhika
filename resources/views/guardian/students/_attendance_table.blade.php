@@ -5,6 +5,12 @@
             @php
                 $checkIn = $attendancesOnDate->where('status', 'in')->first();
                 $checkOut = $attendancesOnDate->where('status', 'out')->last();
+
+                // Cek apakah terlambat (menggunakan batas waktu 06:30)
+                $isLate = false;
+                if ($checkIn && $checkIn->recorded_at->format('H:i:s') > '06:30:00') {
+                    $isLate = true;
+                }
             @endphp
 
             <!-- Attendance Card -->
@@ -16,7 +22,7 @@
                             <div class="flex items-center space-x-3">
                                 <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
                                     <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a4 4 0 118 0v4m-4 0H9m6 0h3m2 0a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V9a2 2 0 012-2h2m8 0V3a4 4 0 00-8 0v4m0 0h8"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                 </div>
                                 <div>
@@ -32,9 +38,14 @@
                                 <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Jam Masuk</p>
                                 @if($checkIn)
                                     <div class="flex items-center space-x-2 justify-center lg:justify-start">
-                                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                        <div class="w-2 h-2 {{ $isLate ? 'bg-yellow-500' : 'bg-green-500' }} rounded-full"></div>
                                         <span class="text-lg font-bold text-slate-800">{{ $checkIn->recorded_at->format('H:i') }}</span>
                                         <span class="text-sm text-slate-500">{{ $checkIn->recorded_at->format('s') }}s</span>
+
+                                        <!-- Badge Terlambat -->
+                                        @if($isLate)
+                                            <span class="text-xs font-bold text-yellow-800 bg-yellow-100 px-2 py-0.5 rounded-md">Terlambat</span>
+                                        @endif
                                     </div>
                                 @else
                                     <div class="flex items-center space-x-2 justify-center lg:justify-start">
@@ -111,8 +122,8 @@
     </div>
 
     <!-- Pagination -->
-    @if(isset($attendances))
-    <div class="flex justify-center">
+    @if($attendances->hasPages())
+    <div class="flex justify-center mt-6">
         <div class="bg-white rounded-xl shadow-lg border border-slate-200/60 p-2">
             {{ $attendances->links('pagination::tailwind') }}
         </div>

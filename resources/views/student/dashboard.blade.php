@@ -23,9 +23,20 @@
             </div>
         </div>
 
+        <!-- PERBAIKAN: Menghitung total hari untuk persentase progress bar -->
+        @php
+            // Total rekap adalah jumlah dari ketiganya, pastikan minimal 1 untuk menghindari pembagian nol
+            $totalRekap = max($attendanceSummary['hadir'] + $attendanceSummary['izin'] + $attendanceSummary['alpa'], 1);
+            $hadirPercent = ($attendanceSummary['hadir'] / $totalRekap) * 100;
+            $izinPercent = ($attendanceSummary['izin'] / $totalRekap) * 100;
+            $alpaPercent = ($attendanceSummary['alpa'] / $totalRekap) * 100;
+        @endphp
+
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <!-- Attendance Card -->
+        <!-- PERBAIKAN: Mengubah grid dari md:grid-cols-2 menjadi md:grid-cols-3 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+            <!-- Attendance Card (Hadir) -->
             <div class="group hover:scale-[1.02] transition-transform duration-200">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 h-full">
                     <div class="flex items-center justify-between mb-4">
@@ -51,12 +62,12 @@
                         </div>
                     </div>
                     <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full" style="width: {{ min(($attendanceSummary['hadir'] / max($attendanceSummary['hadir'] + $attendanceSummary['izin'], 1)) * 100, 100) }}%"></div>
+                        <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full" style="width: {{ $hadirPercent }}%"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Permission Card -->
+            <!-- Permission Card (Izin) -->
             <div class="group hover:scale-[1.02] transition-transform duration-200">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 h-full">
                     <div class="flex items-center justify-between mb-4">
@@ -82,10 +93,42 @@
                         </div>
                     </div>
                     <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" style="width: {{ min(($attendanceSummary['izin'] / max($attendanceSummary['hadir'] + $attendanceSummary['izin'], 1)) * 100, 100) }}%"></div>
+                        <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" style="width: {{ $izinPercent }}%"></div>
                     </div>
                 </div>
             </div>
+
+            <!-- CARD BARU: Alpha (Alpa) -->
+            <div class="group hover:scale-[1.02] transition-transform duration-200">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 h-full">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-red-50 p-3 rounded-xl border border-red-100">
+                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-slate-600 uppercase tracking-wider">Alpa</h3>
+                                <p class="text-xs text-slate-500 mt-1">Tanpa Keterangan</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold text-slate-800 mb-1">{{ $attendanceSummary['alpa'] }}</div>
+                            <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                                Absent
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-red-400 to-red-500 rounded-full" style="width: {{ $alpaPercent }}%"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Recent Permits Section -->

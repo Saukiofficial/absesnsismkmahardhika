@@ -13,9 +13,6 @@ class MonitorController extends Controller
      */
     public function index()
     {
-        // Controller ini hanya bertugas untuk menampilkan file view 'monitor.blade.php'.
-        // Semua logika real-time akan ditangani di sisi frontend menggunakan
-        // JavaScript (Vue.js) dan Laravel Echo.
         return view('monitor');
     }
 }

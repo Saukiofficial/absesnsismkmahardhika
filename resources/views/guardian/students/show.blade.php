@@ -59,6 +59,71 @@
             </div>
         </div>
 
+        <!-- === KARTU BARU: STATUS HARI INI === -->
+        @php
+            $statusColor = '';
+            $statusIcon = '';
+            $statusText = $statusHariIni;
+            $detailText = $detailHariIni;
+
+            switch ($statusHariIni) {
+                case 'Hadir':
+                    $statusColor = 'bg-green-100 text-green-800 border-green-200';
+                    $statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                    $detailText = 'Masuk jam ' . $detailText;
+                    break;
+                case 'Terlambat':
+                    $statusColor = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                    $statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                    $detailText = 'Masuk jam ' . $detailText;
+                    break;
+                case 'Izin':
+                    $statusColor = 'bg-blue-100 text-blue-800 border-blue-200';
+                    $statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>';
+                    break;
+                case 'Alpa':
+                case 'Belum Absen':
+                    $statusColor = 'bg-red-100 text-red-800 border-red-200';
+                    $statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>';
+                    $detailText = 'Tidak ada keterangan';
+                    break;
+                case 'Libur':
+                default:
+                    $statusColor = 'bg-slate-100 text-slate-800 border-slate-200';
+                    $statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>';
+                    $detailText = 'Hari Minggu';
+                    break;
+            }
+        @endphp
+
+        <div class="mb-8">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div class="mb-4 sm:mb-0">
+                        <h3 class="text-xl font-bold text-slate-800">Status Hari Ini</h3>
+                        <p class="text-slate-600 text-sm">{{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM YYYY') }}</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <div class="inline-flex items-center px-4 py-2 rounded-xl {{ $statusColor }} border">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    {!! $statusIcon !!}
+                                </svg>
+                                <span class="text-lg font-bold">{{ $statusText }}</span>
+                            </div>
+                        </div>
+                        @if($detailText)
+                        <div class="text-lg font-medium text-slate-700">
+                            {{ $detailText }}
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- === AKHIR KARTU BARU === -->
+
+
         <!-- Full Width Content -->
         <div class="space-y-8">
             <!-- Attendance History - Full Width -->
@@ -73,23 +138,23 @@
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-slate-800">Riwayat Absensi</h3>
-                                <p class="text-slate-600">Data kehadiran siswa di sekolah</p>
+                                <p class="text-slate-600">Rekap kehadiran siswa bulan ini</p>
                             </div>
                         </div>
 
                         <!-- Summary Stats -->
                         <div class="hidden lg:flex items-center space-x-6">
                             <div class="text-center">
-                                <div class="text-2xl font-bold text-green-600">{{ isset($attendanceStats['present']) ? $attendanceStats['present'] : '--' }}</div>
+                                <div class="text-2xl font-bold text-green-600">{{ $attendanceStats['present'] ?? '--' }}</div>
                                 <div class="text-sm text-slate-600">Hadir</div>
                             </div>
                             <div class="text-center">
-                                <div class="text-2xl font-bold text-yellow-600">{{ isset($attendanceStats['late']) ? $attendanceStats['late'] : '--' }}</div>
+                                <div class="text-2xl font-bold text-yellow-600">{{ $attendanceStats['late'] ?? '--' }}</div>
                                 <div class="text-sm text-slate-600">Terlambat</div>
                             </div>
                             <div class="text-center">
-                                <div class="text-2xl font-bold text-red-600">{{ isset($attendanceStats['absent']) ? $attendanceStats['absent'] : '--' }}</div>
-                                <div class="text-sm text-slate-600">Tidak Hadir</div>
+                                <div class="text-2xl font-bold text-red-600">{{ $attendanceStats['absent'] ?? '--' }}</div>
+                                <div class="text-sm text-slate-600">Alpa</div>
                             </div>
                         </div>
                     </div>
@@ -111,22 +176,22 @@
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-slate-800">Riwayat Pengajuan Izin</h3>
-                                <p class="text-slate-600">Data pengajuan izin dan permohonan</p>
+                                <p class="text-slate-600">Rekap permohonan izin bulan ini</p>
                             </div>
                         </div>
 
                         <!-- Permit Stats -->
                         <div class="hidden lg:flex items-center space-x-6">
                             <div class="text-center">
-                                <div class="text-2xl font-bold text-green-600">{{ isset($permitStats['approved']) ? $permitStats['approved'] : '--' }}</div>
+                                <div class="text-2xl font-bold text-green-600">{{ $permitStats['approved'] ?? '--' }}</div>
                                 <div class="text-sm text-slate-600">Disetujui</div>
                             </div>
                             <div class="text-center">
-                                <div class="text-2xl font-bold text-yellow-600">{{ isset($permitStats['pending']) ? $permitStats['pending'] : '--' }}</div>
+                                <div class="text-2xl font-bold text-yellow-600">{{ $permitStats['pending'] ?? '--' }}</div>
                                 <div class="text-sm text-slate-600">Menunggu</div>
                             </div>
                             <div class="text-center">
-                                <div class="text-2xl font-bold text-red-600">{{ isset($permitStats['rejected']) ? $permitStats['rejected'] : '--' }}</div>
+                                <div class="text-2xl font-bold text-red-600">{{ $permitStats['rejected'] ?? '--' }}</div>
                                 <div class="text-sm text-slate-600">Ditolak</div>
                             </div>
                         </div>

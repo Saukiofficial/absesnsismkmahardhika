@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Actions\ProcessAttendanceAction;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon; // 1. Tambahkan use Carbon
 
 class AttendanceController extends Controller
 {
@@ -14,6 +15,17 @@ class AttendanceController extends Controller
      */
     public function receive(Request $request, ProcessAttendanceAction $processAttendance)
     {
+        // --- PERBAIKAN: BLOK ABSEN HARI MINGGU ---
+        // Carbon::SUNDAY bernilai 0
+        if (Carbon::now()->dayOfWeek === Carbon::SUNDAY) {
+            // Jika hari ini Minggu, tolak permintaan
+            return response()->json([
+                'success' => false,
+                'message' => 'Sistem absensi ditutup pada hari Minggu.'
+            ], 403); // 403 Forbidden
+        }
+        // --- AKHIR PERBAIKAN ---
+
         // Validasi input
         $validated = $request->validate([
             'identifier' => 'required|string',
@@ -40,4 +52,3 @@ class AttendanceController extends Controller
         return response()->json($result, 404);
     }
 }
-

@@ -24,7 +24,7 @@
             min-height: 100vh;
         }
 
-        /* Grid cyber dengan animasi lebih smooth */
+        /* ... (Animasi Grid, Partikel tetap sama) ... */
         .cyber-grid {
             position: fixed;
             top: 0;
@@ -74,7 +74,8 @@
             100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
         }
 
-        /* Neon effects yang lebih intens */
+
+        /* Neon effects */
         .neon-cyan {
             color: #00ffff;
             text-shadow:
@@ -100,6 +101,15 @@
                 0 0 20px rgba(0, 255, 0, 0.2);
         }
 
+        /* PERUBAHAN: Warna Neon Kuning untuk Warning */
+        .neon-yellow {
+            color: #ffff00;
+            text-shadow:
+                0 0 5px rgba(255, 255, 0, 0.5),
+                0 0 10px rgba(255, 255, 0, 0.4),
+                0 0 20px rgba(255, 255, 0, 0.2);
+        }
+
         .neon-orange {
             color: #ff6600;
             text-shadow:
@@ -108,7 +118,7 @@
                 0 0 20px rgba(255, 102, 0, 0.2);
         }
 
-        /* Card hologram yang lebih canggih */
+        /* ... (Holo Card & Shimmer tetap sama) ... */
         .holo-card {
             background: linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(25, 25, 45, 0.8) 100%);
             backdrop-filter: blur(20px) saturate(180%);
@@ -122,7 +132,6 @@
             overflow: hidden;
         }
 
-        /* Shimmer effect untuk card */
         .holo-card::before {
             content: '';
             position: absolute;
@@ -140,7 +149,7 @@
             100% { left: 100%; }
         }
 
-        /* Logo styling dengan efek glow */
+        /* ... (Logo, Header, Scanner tetap sama) ... */
         .school-logo {
             filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.3));
             transition: all 0.3s ease;
@@ -157,7 +166,6 @@
             filter: drop-shadow(0 0 25px rgba(0, 255, 255, 0.6));
         }
 
-        /* Header layout untuk logo dan teks */
         .header-content {
             display: flex;
             align-items: center;
@@ -172,7 +180,6 @@
             min-width: 0;
         }
 
-        /* Responsive logo */
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -195,7 +202,6 @@
             }
         }
 
-        /* Scanner dengan animasi lebih canggih */
         .scanner-frame {
             position: relative;
             background: linear-gradient(45deg, #000 0%, #111 100%);
@@ -220,7 +226,6 @@
             50% { transform: translateY(50px); opacity: 1; }
         }
 
-        /* Status indicator yang lebih canggih */
         .status-online {
             animation: pulseGlow 2s infinite;
             position: relative;
@@ -255,7 +260,7 @@
             100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
         }
 
-        /* Loading spinner yang lebih canggih */
+        /* ... (Spinner, Popup, Time Display tetap sama) ... */
         .cyber-spinner {
             width: 60px;
             height: 60px;
@@ -293,7 +298,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Popup notification yang lebih canggih */
         .popup-enter-active {
             transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -312,10 +316,16 @@
             transform: scale(1.1) rotateY(90deg);
         }
 
-        /* Success/Error states */
+        /* Success/Error/Warning states */
         .success-glow {
             box-shadow: 0 0 30px rgba(0, 255, 0, 0.5) !important;
             border-color: #00ff00 !important;
+        }
+
+        /* PERUBAHAN: Glow Kuning untuk Warning */
+        .warning-glow {
+            box-shadow: 0 0 30px rgba(255, 255, 0, 0.5) !important;
+            border-color: #ffff00 !important;
         }
 
         .error-glow {
@@ -323,7 +333,6 @@
             border-color: #ff0000 !important;
         }
 
-        /* Time display enhancement */
         .time-display {
             background: linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
             border: 1px solid rgba(0, 255, 255, 0.3);
@@ -355,18 +364,8 @@
 </head>
 <body>
     <div class="cyber-grid"></div>
-
-    <!-- Floating particles -->
     <div class="floating-particles">
-        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
-        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
-        <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
-        <div class="particle" style="left: 40%; animation-delay: 6s;"></div>
-        <div class="particle" style="left: 50%; animation-delay: 8s;"></div>
-        <div class="particle" style="left: 60%; animation-delay: 10s;"></div>
-        <div class="particle" style="left: 70%; animation-delay: 12s;"></div>
-        <div class="particle" style="left: 80%; animation-delay: 14s;"></div>
-        <div class="particle" style="left: 90%; animation-delay: 16s;"></div>
+        <!-- ... (particle divs) ... -->
     </div>
 
     <div id="app" @click="focusInput" class="relative z-10 min-h-screen flex items-center justify-center p-4 lg:p-6 cursor-pointer">
@@ -374,6 +373,7 @@
         <input type="text" id="rfid_input" ref="rfidInput" v-model="rfidInput" @input="handleRfidInput" class="absolute top-[-9999px] left-[-9999px]">
 
         <div class="w-full max-w-7xl mx-auto">
+            <!-- ... (Header tetap sama) ... -->
             <header class="text-center mb-8 lg:mb-12">
                 <div class="holo-card rounded-3xl p-6 lg:p-8 mb-8 relative">
                     <div class="absolute top-4 right-4 flex items-center space-x-2">
@@ -407,6 +407,7 @@
             </header>
 
             <main class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                <!-- ... (Scanner dan Time Display tetap sama) ... -->
                 <div class="lg:col-span-2 order-2 lg:order-1">
                     <div class="holo-card rounded-3xl p-6 lg:p-8 relative">
                         <div class="text-center">
@@ -459,39 +460,63 @@
             </main>
         </div>
 
-        <!-- Enhanced Popup Notification -->
+        <!-- PERUBAHAN BESAR: Popup Notification dengan Logika Terlambat -->
         <transition name="popup">
             <div v-if="showPopup" class="fixed inset-0 bg-black/90 backdrop-blur-lg flex items-center justify-center z-50 p-4">
                 <div class="holo-card rounded-3xl p-8 max-w-lg w-full text-center relative transform">
 
-                    <!-- Success/Error indicator -->
+                    <!-- Indikator Ikon (3 Kondisi) -->
                     <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
                         <div class="w-12 h-12 rounded-full flex items-center justify-center"
-                             :class="lastAttendance.status === 'in' ? 'bg-green-500/20 border-2 border-green-400' : 'bg-red-500/20 border-2 border-red-400'">
-                            <svg v-if="lastAttendance.status === 'in'" class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <svg v-else class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                            </svg>
+                             :class="{
+                                'bg-yellow-500/20 border-2 border-yellow-400': lastAttendance.is_late,
+                                'bg-green-500/20 border-2 border-green-400': !lastAttendance.is_late && lastAttendance.status === 'in',
+                                'bg-red-500/20 border-2 border-red-400': !lastAttendance.is_late && lastAttendance.status === 'out'
+                             }">
+
+                            <!-- Ikon Terlambat (Warning) -->
+                            <svg v-if="lastAttendance.is_late" class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>
+                            <!-- Ikon Masuk (Sukses) -->
+                            <svg v-else-if="lastAttendance.status === 'in'" class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <!-- Ikon Pulang (Info) -->
+                            <svg v-else class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         </div>
                     </div>
 
-                    <!-- Header -->
+                    <!-- Header Teks (3 Kondisi) -->
                     <div class="orbitron text-2xl lg:text-3xl font-black mb-6 mt-4"
-                         :class="lastAttendance.status === 'in' ? 'neon-green' : 'neon-orange'"
-                         v-text="lastAttendance.status === 'in' ? 'ACCESS GRANTED' : 'EXIT LOGGED'"></div>
+                         :class="{
+                            'neon-yellow': lastAttendance.is_late,
+                            'neon-green': !lastAttendance.is_late && lastAttendance.status === 'in',
+                            'neon-orange': !lastAttendance.is_late && lastAttendance.status === 'out'
+                         }">
+                         <span v-if="lastAttendance.is_late">WARNING: TERLAMBAT</span>
+                         <span v-else-if="lastAttendance.status === 'in'">ACCESS GRANTED</span>
+                         <span v-else>EXIT LOGGED</span>
+                    </div>
 
-                    <!-- Student Info -->
+                    <!-- Info Siswa -->
                     <div class="mb-8">
                         <div class="relative mb-4">
                             <img :src="lastAttendance.photo_url" alt="Student Photo"
                                  class="w-32 h-32 lg:w-40 lg:h-40 mx-auto rounded-full object-cover border-4 shadow-2xl"
-                                 :class="lastAttendance.status === 'in' ? 'border-green-400 shadow-green-400/50' : 'border-red-400 shadow-red-400/50'">
+                                 :class="{
+                                    'border-yellow-400 shadow-yellow-400/50': lastAttendance.is_late,
+                                    'border-green-400 shadow-green-400/50': !lastAttendance.is_late && lastAttendance.status === 'in',
+                                    'border-red-400 shadow-red-400/50': !lastAttendance.is_late && lastAttendance.status === 'out'
+                                 }">
+
+                            <!-- Badge Status (3 Kondisi) -->
                             <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                                <div class="px-3 py-1 rounded-full text-xs font-bold"
-                                     :class="lastAttendance.status === 'in' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'"
-                                     v-text="lastAttendance.status === 'in' ? 'CHECK IN' : 'CHECK OUT'">
+                                <div class="px-3 py-1 rounded-full text-xs font-bold text-white"
+                                     :class="{
+                                        'bg-yellow-500': lastAttendance.is_late,
+                                        'bg-green-500': !lastAttendance.is_late && lastAttendance.status === 'in',
+                                        'bg-red-500': !lastAttendance.is_late && lastAttendance.status === 'out'
+                                     }">
+                                     <span v-if="lastAttendance.is_late">TERLAMBAT</span>
+                                     <span v-else-if="lastAttendance.status === 'in'">CHECK IN</span>
+                                     <span v-else>CHECK OUT</span>
                                 </div>
                             </div>
                         </div>
@@ -518,7 +543,7 @@
     </div>
 
     <script>
-        // Blade variables yang di-escape dengan benar
+        // Blade variables
         const pusherKey = @json(config('broadcasting.connections.pusher.key'));
         const pusherCluster = @json(config('broadcasting.connections.pusher.options.cluster'));
         const apiKey = @json(config('app.device_api_key'));
@@ -532,12 +557,12 @@
                     currentTime: '',
                     currentDate: '',
                     showPopup: false,
-                    lastAttendance: {},
+                    lastAttendance: {}, // Akan berisi 'is_late' => true/false
                     popupTimer: null,
                     rfidInput: '',
                     rfidTimer: null,
                     isSending: false,
-                    scannerStatus: '',
+                    scannerStatus: '', // success-glow, warning-glow, error-glow
                     lastScanTime: null,
                     connectionRetries: 0,
                     maxRetries: 3
@@ -575,14 +600,22 @@
                             .listen('.new-attendance-event', (e) => {
                                 this.lastAttendance = e.attendanceData;
                                 this.showPopup = true;
-                                this.scannerStatus = this.lastAttendance.status === 'in' ? 'success-glow' : 'success-glow';
+
+                                // PERUBAHAN: Set scanner glow berdasarkan status terlambat
+                                if (this.lastAttendance.is_late) {
+                                    this.scannerStatus = 'warning-glow';
+                                } else {
+                                    // Sukses untuk masuk atau pulang
+                                    this.scannerStatus = 'success-glow';
+                                }
 
                                 if (this.popupTimer) clearTimeout(this.popupTimer);
 
+                                // Durasi popup 3.5 detik
                                 this.popupTimer = setTimeout(() => {
                                     this.showPopup = false;
                                     this.resetState();
-                                }, 1000); // Popup duration 3.5 seconds
+                                }, 3500);
                             })
                             .error((error) => {
                                 console.error('Echo error:', error);
@@ -604,8 +637,7 @@
 
                 handleRfidInput() {
                     if (this.rfidTimer) clearTimeout(this.rfidTimer);
-                    // Optimized: Reduced delay for faster processing
-                    this.rfidTimer = setTimeout(() => this.submitRfid(), 30); // Reduced to 30ms
+                    this.rfidTimer = setTimeout(() => this.submitRfid(), 30);
                 },
 
                 async submitRfid() {
@@ -619,7 +651,7 @@
                     this.lastScanTime = new Date().toLocaleTimeString('id-ID');
 
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
                     try {
                         const response = await fetch(apiUrl, {
@@ -644,12 +676,16 @@
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }
 
+                        // PERUBAHAN: Baca 'is_late' dari response JSON
                         const result = await response.json();
 
-                        // Success feedback
-                        this.scannerStatus = 'success-glow';
+                        if (result.is_late) {
+                            this.scannerStatus = 'warning-glow';
+                        } else {
+                            this.scannerStatus = 'success-glow';
+                        }
 
-                        // Reset after short delay to show success state
+                        // Reset setelah 1 detik (jika popup tidak muncul)
                         setTimeout(() => {
                             if (!this.showPopup) {
                                 this.resetState();
@@ -668,7 +704,7 @@
                         // Error feedback
                         this.scannerStatus = 'error-glow';
 
-                        // Reset after showing error state
+                        // Reset setelah 1.5 detik
                         setTimeout(() => {
                             this.resetState();
                         }, 1500);
@@ -697,14 +733,12 @@
                 this.listenForEvents();
                 this.focusInput();
 
-                // Keep input focused
                 document.addEventListener('click', () => {
                     if (!this.showPopup) {
                         this.focusInput();
                     }
                 });
 
-                // Handle visibility change
                 document.addEventListener('visibilitychange', () => {
                     if (document.visibilityState === 'visible') {
                         this.focusInput();
