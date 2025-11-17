@@ -12,7 +12,15 @@ use App\Http\Controllers\Panel\LeaveController;
 use App\Http\Controllers\Admin\StudentImportController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\Admin\GuardianImportExportController;
-use App\Http\Controllers\Admin\AbsencePermitController; // <-- Tambahan baru
+
+// --- PERBAIKAN ---
+// 1. Hapus 'use' statement yang menyebabkan error
+// use App\Http\Controllers\Admin\AbsencePermitController;
+
+// 2. Tambahkan 'use' statement untuk Controller Admin yang baru
+use App\Http\Controllers\Admin\PermitController;
+// --- AKHIR PERBAIKAN ---
+
 
 /*
 |--------------------------------------------------------------------------
@@ -84,9 +92,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('simulation', [SimulationController::class, 'store'])->name('simulation.store');
 
     // --- PEMBARUAN: Rute untuk Manajemen Izin ---
-    Route::get('permits', [AbsencePermitController::class, 'index'])->name('permits.index');
-    Route::get('permits/{permit}', [AbsencePermitController::class, 'show'])->name('permits.show');
-    Route::put('permits/{permit}/status', [AbsencePermitController::class, 'updateStatus'])->name('permits.updateStatus');
+    // Menggunakan PermitController yang baru
+    Route::get('permits', [PermitController::class, 'index'])->name('permits.index');
+    Route::get('permits/{permit}', [PermitController::class, 'show'])->name('permits.show');
+    Route::put('permits/{permit}/status', [PermitController::class, 'updateStatus'])->name('permits.updateStatus');
     // -------------------------------------------
 });
 
@@ -102,4 +111,3 @@ Route::middleware(['auth', 'role:siswa,wali'])->prefix('panel')->name('panel.')-
         Route::post('/', [LeaveController::class, 'store'])->name('store');
     });
 });
-
