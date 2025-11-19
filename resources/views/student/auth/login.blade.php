@@ -517,8 +517,8 @@
                         <img src="{{ asset('images/logo-smk-mahardhika.png') }}" alt="SMK Mahardhika Logo">
                     </div>
                 </div>
-                <h1 class="welcome-title">Halo,<br>Selamat datang!</h1>
-                <p class="welcome-subtitle">Sistem Informasi Absensi Siswa SMK Mahardhika Surabaya. Kelola kehadiran dengan mudah dan efisien melalui platform digital yang modern dan terintegrasi.</p>
+                <h1 class="welcome-title"><br>Selamat datang!</h1>
+                <p class="welcome-subtitle">TAPIN untuk Siswa SMK Mahardhika Surabaya. Kelola kehadiran dengan mudah dan efisien melalui platform digital yang modern dan terintegrasi.</p>
                 <a href="#" class="view-more-btn">Selengkapnya</a>
             </div>
 

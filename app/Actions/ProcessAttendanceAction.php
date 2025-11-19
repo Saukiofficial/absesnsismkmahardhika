@@ -5,16 +5,13 @@ namespace App\Actions;
 use App\Models\User;
 use App\Models\Attendance;
 use App\Jobs\SendWhatsappNotification;
-// PERUBAHAN: Menggunakan nama Event asli Anda
 use App\Events\NewAttendance;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class ProcessAttendanceAction
 {
-    /**
-     * Batas waktu toleransi keterlambatan.
-     */
+
     const LATE_BOUNDARY = '06:30:00';
 
     public function execute(string $identifier, string $method, string $deviceId): array
@@ -37,19 +34,17 @@ class ProcessAttendanceAction
 
             $status = ($lastAttendance && $lastAttendance->status === 'in') ? 'out' : 'in';
 
-            $now = now(); // Gunakan waktu yang konsisten
+            $now = now();
 
-            // --- PERBAIKAN: LOGIKA CEK TERLAMBAT ---
+
             $isLate = false;
-            // Cek terlambat HANYA jika statusnya 'in' (Masuk)
             if ($status === 'in' && $now->format('H:i:s') > self::LATE_BOUNDARY) {
                 $isLate = true;
             }
-            // --- AKHIR PERBAIKAN ---
 
             $attendance = Attendance::create([
                 'user_id'     => $student->id,
-                'card_uid'    => ($method === 'rfid') ? $identifier : null, // Simpan UID jika pakai rfid
+                'card_uid'    => ($method === 'rfid') ? $identifier : null,
                 'device_id'   => $deviceId,
                 'method'      => $method,
                 'status'      => $status,
@@ -57,8 +52,7 @@ class ProcessAttendanceAction
             ]);
             Log::info('Attendance record created for: ' . $student->name);
 
-            // --- PERBAIKAN ERROR (Baris 73): ---
-            // Mengirim 3 argumen ke Event. File Event (NewAttendance.php) HARUS diupdate (lihat file berikutnya).
+
             try {
                 broadcast(new NewAttendance($student, $attendance, $isLate));
                 Log::info('Broadcast event success for user: ' . $student->name);
@@ -66,18 +60,41 @@ class ProcessAttendanceAction
                 Log::error('Pusher broadcast failed: ' . $e->getMessage());
             }
 
-            // --- PERBAIKAN: Logika Notifikasi WhatsApp ---
-            if ($student->guardian && $student->guardian->guardian_phone) {
-                Log::info('Guardian found with phone number. Preparing to dispatch WhatsApp notification.', [
-                    'guardian_name' => $student->guardian->name,
-                    'guardian_phone' => $student->guardian->guardian_phone
-                ]);
-                $action = ($status === 'in') ? 'masuk' : 'pulang';
-                $message = "Halo {$student->guardian->name}, putra/putri Anda {$student->name} sudah {$action} sekolah pada jam " . $attendance->recorded_at->format('H:i');
 
-                // Tambahkan info terlambat jika $isLate true
-                if ($isLate) {
-                    $message .= " (TERLAMBAT)";
+            if ($student->guardian && $student->guardian->guardian_phone) {
+                Log::info('Guardian found with phone number.', ['guardian_name' => $student->guardian->name]);
+
+                $studentName = $student->name;
+                $studentClass = $student->class ?? '-';
+                $message = "";
+
+                if ($status === 'out') {
+
+                    $message = "Halo Bapak/Ibu Wali Murid 😊\n" .
+                               "Kami dari SMK Mahardhika menginformasikan bahwa:\n\n" .
+                               "*{$studentName}*, kelas {$studentClass},\n" .
+                               "sudah pulang dari sekolah dan tercatat melalui sistem presensi digital SMK Mahardhika hari ini.\n\n" .
+                               "Pesan ini dikirim otomatis sebagai bentuk transparansi dan pemantauan kehadiran siswa secara real-time!\n\n" .
+                               "Terima kasih, semoga anak - anak selamat sampai rumah dan kembali bertemu dengan keluarga";
+                } else {
+
+                    if ($isLate) {
+
+                        $message = "Halo Bapak/Ibu Wali Murid 😊\n" .
+                                   "Kami dari SMK Mahardhika menginformasikan bahwa:\n\n" .
+                                   "*{$studentName}*, kelas {$studentClass},\n" .
+                                   "sudah masuk dan tercatat *hadir terlambat* melalui sistem presensi digital SMK Mahardhika hari ini.\n\n" .
+                                   "Pesan ini dikirim otomatis sebagai bentuk transparansi dan pemantauan kehadiran siswa secara real-time!\n\n" .
+                                   "Terima kasih, semoga kedepannya bisa lebih disiplin waktu";
+                    } else {
+
+                        $message = "Halo Bapak/Ibu Wali Murid 😊\n" .
+                                   "Kami dari SMK Mahardhika menginformasikan bahwa:\n\n" .
+                                   "*{$studentName}*, kelas {$studentClass},\n" .
+                                   "sudah masuk dan tercatat hadir melalui sistem presensi digital SMK Mahardhika hari ini.\n\n" .
+                                   "Pesan ini dikirim otomatis sebagai bentuk transparansi dan pemantauan kehadiran siswa secara real-time!\n\n" .
+                                   "Terima kasih, semoga aktivitas belajar berjalan lancar";
+                    }
                 }
 
                 SendWhatsappNotification::dispatch($student, $student->guardian, $message);
@@ -88,22 +105,21 @@ class ProcessAttendanceAction
                 ]);
             }
 
-            // --- PERBAIKAN: Data untuk API Response ---
-            // Data ini hanya untuk response ke scanner, BUKAN untuk broadcast
+
             $responseData = [
                 'student_name' => $student->name,
                 'class'        => $student->class ?? 'N/A',
                 'status'       => $attendance->status,
                 'time'         => $attendance->recorded_at->format('H:i:s'),
                 'photo_url'    => $student->photo_url ?? 'https://placehold.co/128x128/0f0f23/64e5e5?text=' . substr($student->name, 0, 1),
-                'is_late'      => $isLate, // Kirim status terlambat
+                'is_late'      => $isLate,
             ];
 
             return [
                 'success'        => true,
                 'message'        => 'Absensi berhasil dicatat.',
-                'is_late'        => $isLate, // Kirim status terlambat di response
-                'attendanceData' => $responseData, // Kirim data lengkap
+                'is_late'        => $isLate,
+                'attendanceData' => $responseData,
             ];
 
         } catch (\Exception $e) {

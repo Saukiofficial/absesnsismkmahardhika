@@ -546,14 +546,14 @@
                         <img src="{{ asset('images/logo-smk-mahardhika.png') }}" alt="SMK Mahardhika Logo">
                     </div>
                 </div>
-                <h1 class="welcome-title">Hello,<br>welcome!</h1>
-                <p class="welcome-subtitle">Sistem Informasi Absensi Siswa SMK Mahardhika. Kelola kehadiran siswa dengan mudah dan efisien melalui platform digital yang modern.</p>
+                <h1 class="welcome-title">welcome!</h1>
+                <p class="welcome-subtitle">TAPIN adalah sistem presensi digital SMK Mahardhika yang memudahkan guru dan siswa untuk melakukan pencatatan kehadiran secara cepat dan real time.</p>
                 <a href="#" class="view-more-btn">View more</a>
             </div>
 
             <!-- Login Section -->
             <div class="login-section">
-                <h2 class="login-title">Welcome To Absensi<br>SMK MAHARDHIKA</h2>
+                <h2 class="login-title">Welcome To TAPIN<br>SMK MAHARDHIKA</h2>
                 <p class="login-subtitle">Sistem Informasi Absensi Siswa</p>
 
                 <!-- Session Status -->
