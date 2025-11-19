@@ -8,538 +8,851 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.3/dist/echo.iife.js"></script>
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * {
-            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
-        .orbitron { font-family: 'Orbitron', monospace; }
+
+        body, html {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+        }
 
         body {
-            background: linear-gradient(135deg, #0c0c1d 0%, #1a1a2e 50%, #16213e 100%);
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 25%, #2d1b4e 50%, #1a1f3a 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             position: relative;
-            overflow-x: hidden;
-            color: #ffffff;
-            min-height: 100vh;
         }
 
-        /* ... (Animasi Grid, Partikel tetap sama) ... */
-        .cyber-grid {
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Animated particles background */
+        .particles-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 120%;
-            height: 120%;
-            background-image:
-                linear-gradient(rgba(0, 255, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px);
-            background-size: 60px 60px;
-            animation: gridFloat 30s ease-in-out infinite;
-            opacity: 0.4;
-            z-index: 0;
-        }
-
-        @keyframes gridFloat {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(30px, -20px) rotate(0.5deg); }
-            50% { transform: translate(-20px, 30px) rotate(-0.3deg); }
-            75% { transform: translate(20px, -10px) rotate(0.2deg); }
-        }
-
-        /* Partikel mengambang */
-        .floating-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
+            overflow: hidden;
             pointer-events: none;
             z-index: 1;
         }
 
         .particle {
             position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(100, 229, 229, 0.6);
+            width: 3px;
+            height: 3px;
+            background: rgba(100, 200, 255, 0.6);
             border-radius: 50%;
-            animation: float 20s infinite linear;
+            animation: floatParticle 20s infinite ease-in-out;
         }
 
-        @keyframes float {
-            0% { transform: translateY(100vh) translateX(0px); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
+        @keyframes floatParticle {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            50% {
+                transform: translate(var(--tx), var(--ty)) scale(1.5);
+            }
         }
 
-
-        /* Neon effects */
-        .neon-cyan {
-            color: #00ffff;
-            text-shadow:
-                0 0 5px rgba(0, 255, 255, 0.5),
-                0 0 10px rgba(0, 255, 255, 0.4),
-                0 0 20px rgba(0, 255, 255, 0.3),
-                0 0 40px rgba(0, 255, 255, 0.1);
-        }
-
-        .neon-pink {
-            color: #ff00ff;
-            text-shadow:
-                0 0 5px rgba(255, 0, 255, 0.5),
-                0 0 10px rgba(255, 0, 255, 0.4),
-                0 0 20px rgba(255, 0, 255, 0.2);
-        }
-
-        .neon-green {
-            color: #00ff00;
-            text-shadow:
-                0 0 5px rgba(0, 255, 0, 0.5),
-                0 0 10px rgba(0, 255, 0, 0.4),
-                0 0 20px rgba(0, 255, 0, 0.2);
-        }
-
-        /* PERUBAHAN: Warna Neon Kuning untuk Warning */
-        .neon-yellow {
-            color: #ffff00;
-            text-shadow:
-                0 0 5px rgba(255, 255, 0, 0.5),
-                0 0 10px rgba(255, 255, 0, 0.4),
-                0 0 20px rgba(255, 255, 0, 0.2);
-        }
-
-        .neon-orange {
-            color: #ff6600;
-            text-shadow:
-                0 0 5px rgba(255, 102, 0, 0.5),
-                0 0 10px rgba(255, 102, 0, 0.4),
-                0 0 20px rgba(255, 102, 0, 0.2);
-        }
-
-        /* ... (Holo Card & Shimmer tetap sama) ... */
-        .holo-card {
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(25, 25, 45, 0.8) 100%);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(0, 255, 255, 0.4);
-            box-shadow:
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(255, 255, 255, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .holo-card::before {
-            content: '';
-            position: absolute;
+        /* Grid overlay */
+        .cyber-grid {
+            position: fixed;
             top: 0;
-            left: -100%;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: shimmer 3s infinite;
+            background-image:
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
             z-index: 1;
         }
 
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
         }
 
-        /* ... (Logo, Header, Scanner tetap sama) ... */
-        .school-logo {
-            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.3));
-            transition: all 0.3s ease;
-            animation: logoGlow 4s ease-in-out infinite alternate;
+        /* Glowing orbs */
+        .glow-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: orbFloat 15s ease-in-out infinite;
+            z-index: 1;
         }
 
-        @keyframes logoGlow {
-            0% { filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.3)); }
-            100% { filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5)) drop-shadow(0 0 30px rgba(255, 0, 255, 0.2)); }
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, transparent 70%);
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
         }
 
-        .school-logo:hover {
-            transform: scale(1.05);
-            filter: drop-shadow(0 0 25px rgba(0, 255, 255, 0.6));
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.4) 0%, transparent 70%);
+            bottom: -250px;
+            right: -250px;
+            animation-delay: 5s;
         }
 
-        .header-content {
+        .orb-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 10s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -50px) scale(1.1); }
+            66% { transform: translate(-50px, 50px) scale(0.9); }
+        }
+
+        /* Main container - Full screen */
+        #app {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        /* Glass card effect */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header - Fixed height */
+        .header-section {
+            height: 15vh;
+            min-height: 100px;
+            max-height: 150px;
+            display: flex;
+            align-items: center;
+            padding: 0 3vw;
+        }
+
+        /* Main content - Responsive grid */
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2vw;
+            padding: 0 3vw 2vh;
+            height: calc(85vh - 100px);
+        }
+
+        /* Scanner section */
+        .scanner-section {
+            grid-column: span 2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Info section */
+        .info-section {
+            grid-column: span 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1400px) {
+            .main-content {
+                grid-template-columns: 2fr 1fr;
+            }
+            .scanner-section {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 2vh;
+            }
+            .scanner-section,
+            .info-section {
+                grid-column: span 1;
+            }
+        }
+
+        /* Scanner animation */
+        .scanner-container {
+            position: relative;
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-        }
-
-        .school-info {
-            text-align: left;
-            flex: 1;
-            min-width: 0;
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-                gap: 1rem;
-            }
-            .school-info {
-                text-align: center;
-            }
-            .school-logo {
-                width: 80px !important;
-                height: 80px !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .school-logo {
-                width: 60px !important;
-                height: 60px !important;
-            }
-        }
-
-        .scanner-frame {
-            position: relative;
-            background: linear-gradient(45deg, #000 0%, #111 100%);
-            border: 2px solid #00ffff;
-            box-shadow:
-                0 0 20px rgba(0, 255, 255, 0.3),
-                inset 0 0 20px rgba(0, 255, 255, 0.1);
-        }
-
-        .scanner-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #00ff00, transparent);
-            top: 50%;
-            left: 0;
-            animation: scanLine 2s ease-in-out infinite;
-        }
-
-        @keyframes scanLine {
-            0%, 100% { transform: translateY(-50px); opacity: 0; }
-            50% { transform: translateY(50px); opacity: 1; }
-        }
-
-        .status-online {
-            animation: pulseGlow 2s infinite;
-            position: relative;
-        }
-
-        .status-online::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100%;
-            height: 100%;
-            background: inherit;
-            border-radius: inherit;
-            transform: translate(-50%, -50%);
-            animation: ripple 2s infinite;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% {
-                box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7),
-                           0 0 10px rgba(0, 255, 0, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 0 10px rgba(0, 255, 0, 0),
-                           0 0 20px rgba(0, 255, 0, 0.5);
-            }
-        }
-
-        @keyframes ripple {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
-        }
-
-        /* ... (Spinner, Popup, Time Display tetap sama) ... */
-        .cyber-spinner {
-            width: 60px;
-            height: 60px;
-            position: relative;
-        }
-
-        .cyber-spinner::before,
-        .cyber-spinner::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            animation: spin 1.5s linear infinite;
-        }
-
-        .cyber-spinner::before {
-            width: 100%;
-            height: 100%;
-            border-top-color: #00ffff;
-            border-right-color: #00ffff;
-        }
-
-        .cyber-spinner::after {
-            width: 80%;
-            height: 80%;
-            top: 10%;
-            left: 10%;
-            border-bottom-color: #ff00ff;
-            border-left-color: #ff00ff;
-            animation-direction: reverse;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .popup-enter-active {
-            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .popup-leave-active {
-            transition: all 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53);
-        }
-
-        .popup-enter-from {
-            opacity: 0;
-            transform: scale(0.3) rotateX(90deg);
-        }
-
-        .popup-leave-to {
-            opacity: 0;
-            transform: scale(1.1) rotateY(90deg);
-        }
-
-        /* Success/Error/Warning states */
-        .success-glow {
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5) !important;
-            border-color: #00ff00 !important;
-        }
-
-        /* PERUBAHAN: Glow Kuning untuk Warning */
-        .warning-glow {
-            box-shadow: 0 0 30px rgba(255, 255, 0, 0.5) !important;
-            border-color: #ffff00 !important;
-        }
-
-        .error-glow {
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5) !important;
-            border-color: #ff0000 !important;
-        }
-
-        .time-display {
-            background: linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 1.5vw;
+            border: 2px solid rgba(59, 130, 246, 0.3);
             overflow: hidden;
         }
 
-        .time-display::after {
+        .scanner-beam {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 1), transparent);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+            animation: scanBeam 2s ease-in-out infinite;
+        }
+
+        @keyframes scanBeam {
+            0%, 100% {
+                top: 0;
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            50% {
+                top: 50%;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        /* Robot/Character animation */
+        .robot-container {
+            position: relative;
+            width: 15vw;
+            height: 15vw;
+            min-width: 120px;
+            min-height: 120px;
+            max-width: 200px;
+            max-height: 200px;
+        }
+
+        .robot {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: robotFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes robotFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .robot-head {
+            width: 60%;
+            height: 35%;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            border-radius: 20% 20% 15% 15%;
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .robot-antenna {
+            width: 4px;
+            height: 15%;
+            background: #60a5fa;
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .robot-antenna::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-            animation: timeSweep 4s infinite;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            background: #60a5fa;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
+            animation: antennaBlink 2s ease-in-out infinite;
         }
 
-        @keyframes timeSweep {
-            0%, 100% { transform: translateX(-100%); }
-            50% { transform: translateX(100%); }
+        @keyframes antennaBlink {
+            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.3; transform: translateX(-50%) scale(1.3); }
         }
 
-        @keyframes progressFill {
-            0% { width: 0%; }
-            100% { width: 100%; }
+        .robot-eye {
+            width: 20%;
+            height: 15%;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 35%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: robotBlink 4s infinite;
+        }
+
+        @keyframes robotBlink {
+            0%, 96%, 100% { height: 15%; }
+            98% { height: 2%; }
+        }
+
+        .robot-eye.left { left: 20%; }
+        .robot-eye.right { right: 20%; }
+
+        .robot-eye::after {
+            content: '';
+            position: absolute;
+            width: 40%;
+            height: 40%;
+            background: #1e293b;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: eyeMove 3s ease-in-out infinite;
+        }
+
+        @keyframes eyeMove {
+            0%, 100% { transform: translate(-50%, -50%); }
+            25% { transform: translate(-30%, -50%); }
+            75% { transform: translate(-70%, -50%); }
+        }
+
+        .robot-mouth {
+            width: 40%;
+            height: 8%;
+            background: #1e293b;
+            border-radius: 0 0 20px 20px;
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .robot-body {
+            width: 70%;
+            height: 40%;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 10%;
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .robot-arm {
+            width: 15%;
+            height: 35%;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            border-radius: 20px;
+            position: absolute;
+            top: 50%;
+        }
+
+        .robot-arm.left {
+            left: -10%;
+            transform-origin: top right;
+            animation: armWave 2s ease-in-out infinite;
+        }
+
+        .robot-arm.right {
+            right: -10%;
+            transform-origin: top left;
+            animation: armWave 2s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+
+        @keyframes armWave {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(20deg); }
+        }
+
+        .robot-light {
+            width: 30%;
+            height: 10%;
+            background: #60a5fa;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: lightPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes lightPulse {
+            0%, 100% {
+                opacity: 0.3;
+                box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+            }
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 30px rgba(96, 165, 250, 0.8);
+            }
+        }
+
+        /* Status indicators */
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.7;
+            }
+        }
+
+        /* Time display - Responsive */
+        .time-display {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(96, 165, 250, 0.3);
+        }
+
+        .date-display {
+            font-size: clamp(0.875rem, 1.5vw, 1.25rem);
+        }
+
+        /* Scanner states */
+        .scanner-ready {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .scanner-success {
+            border-color: rgba(16, 185, 129, 0.8);
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.4);
+            animation: successFlash 0.5s ease-out;
+        }
+
+        @keyframes successFlash {
+            0%, 100% { background: rgba(0, 0, 0, 0.3); }
+            50% { background: rgba(16, 185, 129, 0.2); }
+        }
+
+        .scanner-warning {
+            border-color: rgba(245, 158, 11, 0.8);
+            box-shadow: 0 0 50px rgba(245, 158, 11, 0.4);
+            animation: warningFlash 0.5s ease-out;
+        }
+
+        @keyframes warningFlash {
+            0%, 100% { background: rgba(0, 0, 0, 0.3); }
+            50% { background: rgba(245, 158, 11, 0.2); }
+        }
+
+        .scanner-error {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 50px rgba(239, 68, 68, 0.4);
+            animation: errorFlash 0.5s ease-out;
+        }
+
+        @keyframes errorFlash {
+            0%, 100% { background: rgba(0, 0, 0, 0.3); }
+            50% { background: rgba(239, 68, 68, 0.2); }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #60a5fa;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Popup overlay */
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 2vw;
+        }
+
+        .popup-card {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(30px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2vw;
+            padding: 3vw;
+            max-width: 600px;
+            width: 90vw;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: popupBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popupBounce {
+            0% {
+                opacity: 0;
+                transform: scale(0.7) translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .popup-leave-active {
+            animation: popupOut 0.3s ease-in;
+        }
+
+        @keyframes popupOut {
+            to {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
+
+        /* Student photo */
+        .student-photo {
+            width: clamp(120px, 20vw, 200px);
+            height: clamp(120px, 20vw, 200px);
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid;
+            animation: photoZoom 0.6s ease-out;
+        }
+
+        @keyframes photoZoom {
+            0% {
+                transform: scale(0.5) rotate(-10deg);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa, #ec4899);
+            animation: progressSlide 3.5s ease-in-out;
+            box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+
+        @keyframes progressSlide {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        /* Responsive text sizing */
+        .text-responsive-xl {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+        }
+
+        .text-responsive-lg {
+            font-size: clamp(1.25rem, 2vw, 2rem);
+        }
+
+        .text-responsive-md {
+            font-size: clamp(1rem, 1.5vw, 1.5rem);
+        }
+
+        .text-responsive-sm {
+            font-size: clamp(0.875rem, 1.2vw, 1.125rem);
+        }
+
+        .text-responsive-xs {
+            font-size: clamp(0.75rem, 1vw, 0.875rem);
         }
     </style>
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
     <div class="cyber-grid"></div>
-    <div class="floating-particles">
-        <!-- ... (particle divs) ... -->
+
+    <!-- Particles -->
+    <div class="particles-container">
+        <div class="particle" style="left: 10%; --tx: 100px; --ty: -200px; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; --tx: -150px; --ty: -250px; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; --tx: 200px; --ty: -180px; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 40%; --tx: -100px; --ty: -220px; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 50%; --tx: 150px; --ty: -200px; animation-delay: 8s;"></div>
+        <div class="particle" style="left: 60%; --tx: -180px; --ty: -240px; animation-delay: 10s;"></div>
+        <div class="particle" style="left: 70%; --tx: 120px; --ty: -190px; animation-delay: 12s;"></div>
+        <div class="particle" style="left: 80%; --tx: -160px; --ty: -210px; animation-delay: 14s;"></div>
+        <div class="particle" style="left: 90%; --tx: 140px; --ty: -230px; animation-delay: 16s;"></div>
     </div>
 
-    <div id="app" @click="focusInput" class="relative z-10 min-h-screen flex items-center justify-center p-4 lg:p-6 cursor-pointer">
+    <div id="app" @click="focusInput">
 
-        <input type="text" id="rfid_input" ref="rfidInput" v-model="rfidInput" @input="handleRfidInput" class="absolute top-[-9999px] left-[-9999px]">
+        <!-- Hidden RFID Input -->
+        <input type="text"
+               id="rfid_input"
+               ref="rfidInput"
+               v-model="rfidInput"
+               @input="handleRfidInput"
+               style="position: absolute; left: -9999px; top: -9999px; opacity: 0;">
 
-        <div class="w-full max-w-7xl mx-auto">
-            <!-- ... (Header tetap sama) ... -->
-            <header class="text-center mb-8 lg:mb-12">
-                <div class="holo-card rounded-3xl p-6 lg:p-8 mb-8 relative">
-                    <div class="absolute top-4 right-4 flex items-center space-x-2">
-                        <div class="w-3 h-3 bg-green-400 rounded-full status-online"></div>
-                        <span class="text-green-400 text-xs lg:text-sm orbitron font-bold">SYSTEM ONLINE</span>
-                    </div>
+        <!-- Header -->
+        <header class="header-section">
+            <div class="glass-card rounded-3xl w-full flex items-center justify-between px-8 py-4">
 
-                    <!-- Header dengan Logo dan Informasi Sekolah -->
-                    <div class="header-content mb-6">
-                        <img src="{{ asset('images/logo-smk-mahardhika.png') }}"
-                             alt="Logo SMK Mahardika"
-                             class="school-logo w-24 h-24 lg:w-32 lg:h-32 xl:w-36 xl:h-36 object-contain">
+                <!-- Logo & Title -->
+                <div class="flex items-center gap-6">
+                    <img src="{{ asset('images/logo-smk-mahardhika.png') }}"
+                         alt="Logo SMK Mahardika"
+                         style="width: clamp(60px, 8vw, 100px); height: clamp(60px, 8vw, 100px);"
+                         class="object-contain transition-transform hover:scale-110">
 
-                        <div class="school-info">
-                            <h1 class="orbitron text-2xl lg:text-4xl xl:text-5xl font-black neon-cyan mb-2">
-                                SMK MAHARDHIKA SURABAYA
-                            </h1>
-                            <h2 class="orbitron text-lg lg:text-2xl xl:text-3xl font-bold neon-pink mb-2">
-                                SISTEM ABSENSI DIGITAL
-                            </h2>
-                            <div class="text-cyan-300 text-sm lg:text-base font-semibold">
-                                REAL-TIME ATTENDANCE TRACKING
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="text-cyan-400 text-xs lg:text-sm opacity-75">
-                        SURABAYA DIVISION • AUTOMATED SYSTEM • DEVELOPED BY KYYSOLUTIONS
+                    <div>
+                        <h1 class="text-responsive-lg font-bold text-white mb-1">
+                            SMK MAHARDHIKA SURABAYA
+                        </h1>
+                        <p class="text-responsive-sm text-blue-400 font-semibold">
+                            TAPIN - Real-time Attendance System
+                        </p>
                     </div>
                 </div>
-            </header>
 
-            <main class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                <!-- ... (Scanner dan Time Display tetap sama) ... -->
-                <div class="lg:col-span-2 order-2 lg:order-1">
-                    <div class="holo-card rounded-3xl p-6 lg:p-8 relative">
-                        <div class="text-center">
-                            <h3 class="orbitron text-xl lg:text-2xl font-bold neon-orange mb-6">RFID SCANNER INTERFACE</h3>
-                            <div class="scanner-frame w-full max-w-md h-48 lg:h-60 mx-auto rounded-2xl flex items-center justify-center relative" :class="scannerStatus">
-                                <div class="scanner-line" v-if="!isSending"></div>
+                <!-- Status & Time -->
+                <div class="flex items-center gap-8">
+                    <div class="flex items-center gap-3">
+                        <div class="status-dot bg-green-400"></div>
+                        <span class="text-responsive-sm font-semibold text-green-400">ONLINE</span>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-responsive-md font-bold text-blue-400" v-text="currentTime"></div>
+                        <div class="text-responsive-xs text-gray-400" v-text="currentDate"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-                                <div class="text-center z-10">
-                                    <div v-if="!isSending" class="w-16 h-16 mx-auto mb-4 border-2 border-green-400 rounded-full flex items-center justify-center relative">
-                                        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                        </svg>
-                                    </div>
+        <!-- Main Content -->
+        <main class="main-content">
 
-                                    <div v-if="isSending" class="cyber-spinner mx-auto mb-4"></div>
+            <!-- Scanner Section -->
+            <div class="scanner-section">
+                <div class="glass-card rounded-3xl p-6 h-full flex flex-col">
+                    <h2 class="text-responsive-md font-bold text-white mb-4 text-center">
+                        🔍 RFID Scanner Interface
+                    </h2>
 
-                                    <p class="orbitron text-lg lg:text-xl font-bold mb-2"
-                                       :class="isSending ? 'text-orange-400' : 'text-green-400'"
-                                       v-text="isSending ? 'PROCESSING DATA...' : 'SCANNER ACTIVE'"></p>
-                                    <p class="text-cyan-300 text-sm" v-text="isSending ? 'Please wait...' : 'Scan your RFID card'"></p>
+                    <!-- Scanner Display -->
+                    <div class="scanner-container"
+                         :class="scannerClass">
 
-                                    <div v-if="lastScanTime" class="mt-4 text-xs text-gray-400">
-                                        <span>Last scan: </span><span v-text="lastScanTime"></span>
-                                    </div>
+                        <!-- Scanning beam -->
+                        <div class="scanner-beam" v-if="!isSending"></div>
+
+                        <!-- Robot Character -->
+                        <div class="robot-container" v-if="!isSending">
+                            <div class="robot">
+                                <div class="robot-head">
+                                    <div class="robot-antenna"></div>
+                                    <div class="robot-eye left"></div>
+                                    <div class="robot-eye right"></div>
+                                    <div class="robot-mouth"></div>
+                                </div>
+                                <div class="robot-body">
+                                    <div class="robot-arm left"></div>
+                                    <div class="robot-arm right"></div>
+                                    <div class="robot-light"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="space-y-6 order-1 lg:order-2">
-                    <div class="holo-card time-display rounded-3xl p-6">
-                        <div class="text-center">
-                            <p class="text-cyan-300 text-sm orbitron mb-2 font-semibold">SYSTEM TIME</p>
-                            <div class="orbitron text-2xl lg:text-4xl font-black neon-cyan mb-2" v-text="currentTime"></div>
-                            <div class="text-pink-300 text-xs lg:text-sm font-medium" v-text="currentDate"></div>
+                        <!-- Loading State -->
+                        <div v-if="isSending" class="flex flex-col items-center">
+                            <div class="spinner mb-6"></div>
+                            <p class="text-responsive-md font-bold text-blue-400">Processing...</p>
+                            <p class="text-responsive-sm text-gray-400 mt-2">Please wait</p>
                         </div>
                     </div>
 
-                    <div class="holo-card rounded-3xl p-6">
-                        <div class="text-center">
-                            <p class="text-orange-300 text-sm orbitron mb-3 font-semibold">CONNECTION STATUS</p>
-                            <div class="flex items-center justify-center space-x-2">
-                                <div class="w-2 h-2 bg-green-400 rounded-full status-online"></div>
-                                <span class="text-green-400 text-sm font-bold">CONNECTED</span>
-                            </div>
-                        </div>
+                    <!-- Scanner Status Text -->
+                    <div class="mt-6 text-center">
+                        <p class="text-responsive-md font-bold mb-2"
+                           :class="statusTextClass"
+                           v-text="statusMessage">
+                        </p>
+                        <p v-if="lastScanTime" class="text-responsive-xs text-gray-500">
+                            Last scan: <span v-text="lastScanTime"></span>
+                        </p>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
 
-        <!-- PERUBAHAN BESAR: Popup Notification dengan Logika Terlambat -->
+            <!-- Info Section -->
+            <div class="info-section">
+
+                <!-- Time Display -->
+                <div class="glass-card rounded-3xl p-6 flex-1 flex flex-col justify-center">
+                    <p class="text-responsive-xs font-semibold text-gray-400 text-center mb-3">SYSTEM TIME</p>
+                    <div class="text-center">
+                        <div class="time-display mb-2" v-text="currentTime"></div>
+                        <p class="date-display text-blue-300 font-medium" v-text="currentDate"></p>
+                    </div>
+                </div>
+
+                <!-- Connection Status -->
+                <div class="glass-card rounded-3xl p-6">
+                    <p class="text-responsive-xs font-semibold text-gray-400 text-center mb-3">CONNECTION</p>
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="status-dot bg-green-400"></div>
+                        <span class="text-responsive-sm font-bold text-green-400">CONNECTED</span>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <p class="text-responsive-xs text-gray-500">Device ID</p>
+                        <p class="text-responsive-sm font-mono text-blue-400 font-semibold">MONITOR-GERBANG</p>
+                    </div>
+                </div>
+
+                <!-- Quick Info -->
+                <div class="glass-card rounded-3xl p-6">
+                    <p class="text-responsive-xs font-semibold text-gray-400 text-center mb-3">SYSTEM INFO</p>
+                    <div class="space-y-2 text-center">
+                        <p class="text-responsive-xs text-gray-400">Developed by</p>
+                        <p class="text-responsive-sm font-bold text-purple-400">KYYSOLUTIONS</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Popup Notification -->
         <transition name="popup">
-            <div v-if="showPopup" class="fixed inset-0 bg-black/90 backdrop-blur-lg flex items-center justify-center z-50 p-4">
-                <div class="holo-card rounded-3xl p-8 max-w-lg w-full text-center relative transform">
+            <div v-if="showPopup" class="popup-overlay">
+                <div class="popup-card">
 
-                    <!-- Indikator Ikon (3 Kondisi) -->
-                    <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center"
-                             :class="{
-                                'bg-yellow-500/20 border-2 border-yellow-400': lastAttendance.is_late,
-                                'bg-green-500/20 border-2 border-green-400': !lastAttendance.is_late && lastAttendance.status === 'in',
-                                'bg-red-500/20 border-2 border-red-400': !lastAttendance.is_late && lastAttendance.status === 'out'
-                             }">
+                    <!-- Status Icon -->
+                    <div class="flex justify-center mb-6">
+                        <div class="w-24 h-24 rounded-full flex items-center justify-center"
+                             :style="popupIconStyle">
 
-                            <!-- Ikon Terlambat (Warning) -->
-                            <svg v-if="lastAttendance.is_late" class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>
-                            <!-- Ikon Masuk (Sukses) -->
-                            <svg v-else-if="lastAttendance.status === 'in'" class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            <!-- Ikon Pulang (Info) -->
-                            <svg v-else class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <!-- Warning Icon -->
+                            <svg v-if="lastAttendance.is_late" class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-1.664-1.333-2.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+
+                            <!-- Check In Icon -->
+                            <svg v-else-if="lastAttendance.status === 'in'" class="w-12 h-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+
+                            <!-- Check Out Icon -->
+                            <svg v-else class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
                         </div>
                     </div>
 
-                    <!-- Header Teks (3 Kondisi) -->
-                    <div class="orbitron text-2xl lg:text-3xl font-black mb-6 mt-4"
-                         :class="{
-                            'neon-yellow': lastAttendance.is_late,
-                            'neon-green': !lastAttendance.is_late && lastAttendance.status === 'in',
-                            'neon-orange': !lastAttendance.is_late && lastAttendance.status === 'out'
-                         }">
-                         <span v-if="lastAttendance.is_late">WARNING: TERLAMBAT</span>
-                         <span v-else-if="lastAttendance.status === 'in'">ACCESS GRANTED</span>
-                         <span v-else>EXIT LOGGED</span>
-                    </div>
+                    <!-- Status Text -->
+                    <h2 class="text-responsive-xl font-bold text-center mb-2"
+                        :class="popupTitleClass"
+                        v-text="popupTitle">
+                    </h2>
 
-                    <!-- Info Siswa -->
-                    <div class="mb-8">
-                        <div class="relative mb-4">
-                            <img :src="lastAttendance.photo_url" alt="Student Photo"
-                                 class="w-32 h-32 lg:w-40 lg:h-40 mx-auto rounded-full object-cover border-4 shadow-2xl"
-                                 :class="{
-                                    'border-yellow-400 shadow-yellow-400/50': lastAttendance.is_late,
-                                    'border-green-400 shadow-green-400/50': !lastAttendance.is_late && lastAttendance.status === 'in',
-                                    'border-red-400 shadow-red-400/50': !lastAttendance.is_late && lastAttendance.status === 'out'
-                                 }">
+                    <!-- Photo -->
+                    <div class="flex justify-center my-6">
+                        <div class="relative">
+                            <img :src="lastAttendance.photo_url"
+                                 alt="Student Photo"
+                                 class="student-photo"
+                                 :style="photoStyle">
 
-                            <!-- Badge Status (3 Kondisi) -->
-                            <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                                <div class="px-3 py-1 rounded-full text-xs font-bold text-white"
-                                     :class="{
-                                        'bg-yellow-500': lastAttendance.is_late,
-                                        'bg-green-500': !lastAttendance.is_late && lastAttendance.status === 'in',
-                                        'bg-red-500': !lastAttendance.is_late && lastAttendance.status === 'out'
-                                     }">
-                                     <span v-if="lastAttendance.is_late">TERLAMBAT</span>
-                                     <span v-else-if="lastAttendance.status === 'in'">CHECK IN</span>
-                                     <span v-else>CHECK OUT</span>
-                                </div>
+                            <!-- Badge -->
+                            <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-sm font-bold text-white"
+                                 :style="badgeStyle"
+                                 v-text="badgeText">
                             </div>
                         </div>
-                        <h2 class="text-2xl lg:text-3xl font-bold text-white mb-2" v-text="lastAttendance.student_name"></h2>
-                        <p class="text-pink-400 font-semibold text-lg" v-text="lastAttendance.class"></p>
                     </div>
 
-                    <!-- Timestamp -->
-                    <div class="bg-black/60 rounded-2xl p-6 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10"></div>
-                        <p class="text-cyan-400 text-sm orbitron mb-2 font-semibold relative z-10">TIMESTAMP</p>
-                        <p class="orbitron text-3xl lg:text-4xl font-black neon-cyan relative z-10" v-text="lastAttendance.time"></p>
+                    <!-- Student Info -->
+                    <div class="text-center mb-6">
+                        <h3 class="text-responsive-lg font-bold text-white mb-1" v-text="lastAttendance.student_name"></h3>
+                        <p class="text-responsive-md text-blue-400 font-semibold" v-text="lastAttendance.class"></p>
                     </div>
 
-                    <!-- Progress bar -->
-                    <div class="mt-6">
-                        <div class="w-full bg-gray-700 rounded-full h-1 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full animate-pulse" style="width: 100%; animation: progressFill 3s ease-in-out;"></div>
-                        </div>
+                    <!-- Time Info -->
+                    <div class="glass-card rounded-2xl p-6 mb-6">
+                        <p class="text-responsive-xs text-gray-400 text-center mb-2">TIMESTAMP</p>
+                        <p class="text-responsive-xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"
+                           style="-webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+                           v-text="lastAttendance.time"></p>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
                     </div>
                 </div>
             </div>
         </transition>
+
     </div>
 
     <script>
@@ -549,7 +862,7 @@
         const apiKey = @json(config('app.device_api_key'));
         const apiUrl = @json(route('api.attendance.receive'));
 
-        const { createApp } = Vue
+        const { createApp } = Vue;
 
         createApp({
             data() {
@@ -557,15 +870,76 @@
                     currentTime: '',
                     currentDate: '',
                     showPopup: false,
-                    lastAttendance: {}, // Akan berisi 'is_late' => true/false
+                    lastAttendance: {},
                     popupTimer: null,
                     rfidInput: '',
                     rfidTimer: null,
                     isSending: false,
-                    scannerStatus: '', // success-glow, warning-glow, error-glow
+                    scannerStatus: '',
                     lastScanTime: null,
                     connectionRetries: 0,
                     maxRetries: 3
+                }
+            },
+            computed: {
+                scannerClass() {
+                    const baseClass = 'scanner-ready';
+                    if (this.scannerStatus === 'success') return 'scanner-success';
+                    if (this.scannerStatus === 'warning') return 'scanner-warning';
+                    if (this.scannerStatus === 'error') return 'scanner-error';
+                    return baseClass;
+                },
+                statusTextClass() {
+                    if (this.isSending) return 'text-blue-400';
+                    if (this.scannerStatus === 'success') return 'text-green-400';
+                    if (this.scannerStatus === 'warning') return 'text-yellow-400';
+                    if (this.scannerStatus === 'error') return 'text-red-400';
+                    return 'text-blue-400';
+                },
+                statusMessage() {
+                    if (this.isSending) return '⏳ Processing Data...';
+                    if (this.scannerStatus === 'success') return '✅ Scan Successful!';
+                    if (this.scannerStatus === 'warning') return '⚠️ Late Entry Detected';
+                    if (this.scannerStatus === 'error') return '❌ Scan Failed';
+                    return '👋 Ready to Scan - Tap Your Card';
+                },
+                popupIconStyle() {
+                    if (this.lastAttendance.is_late) {
+                        return 'background: rgba(245, 158, 11, 0.2); border: 3px solid rgb(245, 158, 11);';
+                    } else if (this.lastAttendance.status === 'in') {
+                        return 'background: rgba(16, 185, 129, 0.2); border: 3px solid rgb(16, 185, 129);';
+                    } else {
+                        return 'background: rgba(239, 68, 68, 0.2); border: 3px solid rgb(239, 68, 68);';
+                    }
+                },
+                popupTitleClass() {
+                    if (this.lastAttendance.is_late) return 'text-yellow-400';
+                    if (this.lastAttendance.status === 'in') return 'text-green-400';
+                    return 'text-red-400';
+                },
+                popupTitle() {
+                    if (this.lastAttendance.is_late) return '⚠️ TERLAMBAT!';
+                    if (this.lastAttendance.status === 'in') return '✅ CHECK IN BERHASIL';
+                    return '👋 CHECK OUT BERHASIL';
+                },
+                photoStyle() {
+                    if (this.lastAttendance.is_late) {
+                        return 'border-color: rgb(245, 158, 11); box-shadow: 0 0 30px rgba(245, 158, 11, 0.5);';
+                    } else if (this.lastAttendance.status === 'in') {
+                        return 'border-color: rgb(16, 185, 129); box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);';
+                    } else {
+                        return 'border-color: rgb(239, 68, 68); box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);';
+                    }
+                },
+                badgeStyle() {
+                    if (this.lastAttendance.is_late) return 'background: rgb(245, 158, 11);';
+                    if (this.lastAttendance.status === 'in') return 'background: rgb(16, 185, 129);';
+                    return 'background: rgb(239, 68, 68);';
+                },
+                badgeText() {
+                    if (this.lastAttendance.is_late) return '⚠️ TERLAMBAT';
+                    if (this.lastAttendance.status === 'in') return '✓ CHECK IN';
+                    return '→ CHECK OUT';
                 }
             },
             methods: {
@@ -575,7 +949,7 @@
                         hour: '2-digit',
                         minute: '2-digit',
                         second: '2-digit'
-                    }).replace(/\./g, ':');
+                    });
 
                     this.currentDate = now.toLocaleDateString('id-ID', {
                         weekday: 'long',
@@ -601,17 +975,14 @@
                                 this.lastAttendance = e.attendanceData;
                                 this.showPopup = true;
 
-                                // PERUBAHAN: Set scanner glow berdasarkan status terlambat
                                 if (this.lastAttendance.is_late) {
-                                    this.scannerStatus = 'warning-glow';
+                                    this.scannerStatus = 'warning';
                                 } else {
-                                    // Sukses untuk masuk atau pulang
-                                    this.scannerStatus = 'success-glow';
+                                    this.scannerStatus = 'success';
                                 }
 
                                 if (this.popupTimer) clearTimeout(this.popupTimer);
 
-                                // Durasi popup 3.5 detik
                                 this.popupTimer = setTimeout(() => {
                                     this.showPopup = false;
                                     this.resetState();
@@ -676,16 +1047,14 @@
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }
 
-                        // PERUBAHAN: Baca 'is_late' dari response JSON
                         const result = await response.json();
 
                         if (result.is_late) {
-                            this.scannerStatus = 'warning-glow';
+                            this.scannerStatus = 'warning';
                         } else {
-                            this.scannerStatus = 'success-glow';
+                            this.scannerStatus = 'success';
                         }
 
-                        // Reset setelah 1 detik (jika popup tidak muncul)
                         setTimeout(() => {
                             if (!this.showPopup) {
                                 this.resetState();
@@ -701,10 +1070,8 @@
                             console.error('Fetch Error:', error);
                         }
 
-                        // Error feedback
-                        this.scannerStatus = 'error-glow';
+                        this.scannerStatus = 'error';
 
-                        // Reset setelah 1.5 detik
                         setTimeout(() => {
                             this.resetState();
                         }, 1500);
@@ -745,7 +1112,7 @@
                     }
                 });
             }
-        }).mount('#app')
+        }).mount('#app');
     </script>
 </body>
 </html>
