@@ -262,169 +262,17 @@
             max-height: 200px;
         }
 
-        .robot {
+        .robot-image {
             width: 100%;
             height: 100%;
-            position: relative;
+            object-fit: contain;
             animation: robotFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
         }
 
         @keyframes robotFloat {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-10px) rotate(2deg); }
-        }
-
-        .robot-head {
-            width: 60%;
-            height: 35%;
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-            border-radius: 20% 20% 15% 15%;
-            position: absolute;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-        }
-
-        .robot-antenna {
-            width: 4px;
-            height: 15%;
-            background: #60a5fa;
-            position: absolute;
-            top: -10%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 10px 10px 0 0;
-        }
-
-        .robot-antenna::after {
-            content: '';
-            position: absolute;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 12px;
-            height: 12px;
-            background: #60a5fa;
-            border-radius: 50%;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
-            animation: antennaBlink 2s ease-in-out infinite;
-        }
-
-        @keyframes antennaBlink {
-            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-            50% { opacity: 0.3; transform: translateX(-50%) scale(1.3); }
-        }
-
-        .robot-eye {
-            width: 20%;
-            height: 15%;
-            background: #fff;
-            border-radius: 50%;
-            position: absolute;
-            top: 35%;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: robotBlink 4s infinite;
-        }
-
-        @keyframes robotBlink {
-            0%, 96%, 100% { height: 15%; }
-            98% { height: 2%; }
-        }
-
-        .robot-eye.left { left: 20%; }
-        .robot-eye.right { right: 20%; }
-
-        .robot-eye::after {
-            content: '';
-            position: absolute;
-            width: 40%;
-            height: 40%;
-            background: #1e293b;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: eyeMove 3s ease-in-out infinite;
-        }
-
-        @keyframes eyeMove {
-            0%, 100% { transform: translate(-50%, -50%); }
-            25% { transform: translate(-30%, -50%); }
-            75% { transform: translate(-70%, -50%); }
-        }
-
-        .robot-mouth {
-            width: 40%;
-            height: 8%;
-            background: #1e293b;
-            border-radius: 0 0 20px 20px;
-            position: absolute;
-            bottom: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .robot-body {
-            width: 70%;
-            height: 40%;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            border-radius: 10%;
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translateX(-50%);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-        }
-
-        .robot-arm {
-            width: 15%;
-            height: 35%;
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-            border-radius: 20px;
-            position: absolute;
-            top: 50%;
-        }
-
-        .robot-arm.left {
-            left: -10%;
-            transform-origin: top right;
-            animation: armWave 2s ease-in-out infinite;
-        }
-
-        .robot-arm.right {
-            right: -10%;
-            transform-origin: top left;
-            animation: armWave 2s ease-in-out infinite;
-            animation-delay: 1s;
-        }
-
-        @keyframes armWave {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(20deg); }
-        }
-
-        .robot-light {
-            width: 30%;
-            height: 10%;
-            background: #60a5fa;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: lightPulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes lightPulse {
-            0%, 100% {
-                opacity: 0.3;
-                box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
-            }
-            50% {
-                opacity: 1;
-                box-shadow: 0 0 30px rgba(96, 165, 250, 0.8);
-            }
         }
 
         /* Status indicators */
@@ -709,19 +557,9 @@
 
                         <!-- Robot Character -->
                         <div class="robot-container" v-if="!isSending">
-                            <div class="robot">
-                                <div class="robot-head">
-                                    <div class="robot-antenna"></div>
-                                    <div class="robot-eye left"></div>
-                                    <div class="robot-eye right"></div>
-                                    <div class="robot-mouth"></div>
-                                </div>
-                                <div class="robot-body">
-                                    <div class="robot-arm left"></div>
-                                    <div class="robot-arm right"></div>
-                                    <div class="robot-light"></div>
-                                </div>
-                            </div>
+                            <img src="{{ asset('images/robot.png') }}"
+                                 alt="Robot Scanner"
+                                 class="robot-image">
                         </div>
 
                         <!-- Loading State -->
