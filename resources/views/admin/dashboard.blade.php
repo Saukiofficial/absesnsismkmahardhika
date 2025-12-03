@@ -69,7 +69,7 @@
             </div>
             <div class="mt-4 flex items-center text-xs text-green-600 font-medium">
                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                Absensi Masuk
+                Tapin
             </div>
         </div>
 
@@ -137,7 +137,7 @@
         <!-- KOLOM KIRI: Aktivitas Absensi -->
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-gray-800">Aktivitas Absensi</h3>
+                <h3 class="text-lg font-bold text-gray-800">Aktivitas Tapin</h3>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 animate-pulse">
                     Live Update
                 </span>
@@ -178,7 +178,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="px-6 py-8 text-center text-gray-500 text-sm">Belum ada aktivitas absensi hari ini.</td>
+                                <td colspan="3" class="px-6 py-8 text-center text-gray-500 text-sm">Belum ada aktivitas Tapin hari ini.</td>
                             </tr>
                         @endforelse
                     </tbody>

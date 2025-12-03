@@ -232,7 +232,7 @@
 
                     <h1 class="text-lg font-bold logo-animation bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-center"
                         x-show="!sidebarCollapsed || isMobile">
-                        AbsenSI
+                        TAPIN
                     </h1>
                     <p class="text-xs text-blue-200 text-center font-medium"
                        x-show="!sidebarCollapsed || isMobile">SMK Mahardhika</p>
