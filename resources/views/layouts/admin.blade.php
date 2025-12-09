@@ -341,28 +341,74 @@
                         <p class="text-xs text-blue-200 mt-0.5">Persetujuan absen</p>
                     </div>
                 </a>
-                <!-- Akhir Pembaruan -->
 
-                <!-- Simulasi Absensi -->
-                {{--  <a href="{{ route('admin.simulation.index') }}" class="glass-menu-item flex items-center px-4 py-3 rounded-xl group {{ request()->routeIs('admin.simulation.*') ? 'active' : '' }}"
+                <div class="sidebar-divider" x-show="!sidebarCollapsed || isMobile"></div>
+
+                <!-- Menu Hari Libur -->
+                <a href="{{ route('admin.holidays.index') }}" class="glass-menu-item flex items-center px-4 py-3 rounded-xl group {{ request()->routeIs('admin.holidays.*') ? 'active' : '' }}"
                    :class="{'justify-center': sidebarCollapsed && !isMobile}">
                     <div class="menu-icon flex items-center justify-center w-8 h-8 flex-shrink-0"
                          :class="{'mr-3': !sidebarCollapsed || isMobile}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
                         </svg>
                     </div>
                     <div class="menu-text transition-all duration-300"
                          :class="{'opacity-100': !sidebarCollapsed || isMobile, 'opacity-0': sidebarCollapsed && !isMobile}"
                          x-show="!sidebarCollapsed || isMobile">
-                        <span class="font-medium">Simulasi</span>
-                        <p class="text-xs text-blue-200 mt-0.5">Test absensi</p>
+                        <span class="font-medium">Hari Libur</span>
+                        <p class="text-xs text-blue-200 mt-0.5">Kelola hari libur</p>
                     </div>
-                </a>  --}}
+                </a>
+                <!-- Akhir Pembaruan -->
             </nav>
 
             <!-- Footer -->
-            <div class="px-4 py-4 border-t border-white/10">
+            <div class="px-4 py-4 border-t border-white/10" x-data="{ systemOn: true }">
+                <!-- System Toggle Switch -->
+                <div class="mb-4"
+                     :class="{'opacity-100': !sidebarCollapsed || isMobile, 'opacity-0': sidebarCollapsed && !isMobile}"
+                     x-show="!sidebarCollapsed || isMobile">
+                    <div class="glass-menu-item px-4 py-3 rounded-xl">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-300"
+                                     :class="systemOn ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">System</p>
+                                    <p class="text-xs transition-colors duration-300"
+                                       :class="systemOn ? 'text-green-300' : 'text-red-300'"
+                                       x-text="systemOn ? 'Active' : 'Inactive'"></p>
+                                </div>
+                            </div>
+                            <!-- Toggle Button -->
+                            <button @click="systemOn = !systemOn"
+                                    class="relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-700"
+                                    :class="systemOn ? 'bg-green-500 focus:ring-green-500' : 'bg-red-500 focus:ring-red-500'">
+                                <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform duration-300"
+                                      :class="systemOn ? 'translate-x-8' : 'translate-x-1'"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collapsed System Icon -->
+                <div class="flex justify-center mb-4"
+                     x-show="sidebarCollapsed && !isMobile">
+                    <button @click="systemOn = !systemOn"
+                            class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+                            :class="systemOn ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Copyright & Status -->
                 <div class="transition-all duration-300"
                      :class="{'opacity-100': !sidebarCollapsed || isMobile, 'opacity-0': sidebarCollapsed && !isMobile}"
                      x-show="!sidebarCollapsed || isMobile">
@@ -384,8 +430,8 @@
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Header -->
-            <header class="flex justify-between items-center p-6 bg-white/80 backdrop-filter backdrop-blur-lg border-b border-gray-200/50 shadow-sm">
+            <!-- Header - PERUBAHAN UTAMA: Tambahkan z-50 -->
+            <header class="flex justify-between items-center p-6 bg-white/80 backdrop-filter backdrop-blur-lg border-b border-gray-200/50 shadow-sm relative z-50">
                 <div class="flex items-center space-x-4">
                     <button @click="sidebarOpen = !sidebarOpen"
                             class="text-gray-600 hover:text-gray-900 focus:outline-none lg:hidden transition-colors duration-200">
@@ -410,6 +456,7 @@
                         </svg>
                     </button>
 
+                    <!-- PERUBAHAN UTAMA: Ubah z-20 menjadi z-50 -->
                     <div x-show="dropdownOpen"
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 transform scale-95"
@@ -418,7 +465,7 @@
                          x-transition:leave-start="opacity-100 transform scale-100"
                          x-transition:leave-end="opacity-0 transform scale-95"
                          @click.away="dropdownOpen = false"
-                         class="absolute right-0 mt-2 w-56 user-dropdown rounded-xl shadow-2xl z-20 overflow-hidden"
+                         class="absolute right-0 mt-2 w-56 user-dropdown rounded-xl shadow-2xl z-50 overflow-hidden"
                          x-cloak>
 
                         <div class="px-4 py-3 border-b border-gray-100">

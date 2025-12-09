@@ -17,9 +17,10 @@ use App\Http\Controllers\Admin\GuardianImportExportController;
 // 1. Hapus 'use' statement yang menyebabkan error
 // use App\Http\Controllers\Admin\AbsencePermitController;
 
-// 2. Tambahkan 'use' statement untuk Controller Admin yang baru
 use App\Http\Controllers\Admin\PermitController;
-// --- AKHIR PERBAIKAN ---
+use App\Http\Controllers\Admin\HolidayController;
+use App\Http\Controllers\Admin\SystemController;
+
 
 
 /*
@@ -77,31 +78,32 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('guardians/import/template', [GuardianImportExportController::class, 'downloadTemplate'])->name('guardians.import.template');
     Route::get('guardians/export', [GuardianImportExportController::class, 'export'])->name('guardians.export');
 
-    // Rute API untuk pencarian wali murid (dari form siswa)
     Route::get('/guardians/search', [GuardianController::class, 'search'])->name('guardians.search');
 
-    // Guardian Management
     Route::resource('guardians', GuardianController::class);
 
-    // Attendance Management
     Route::get('attendances', [AdminAttendanceController::class, 'index'])->name('attendances.index');
     Route::get('attendances/export', [AdminAttendanceController::class, 'export'])->name('attendances.export');
 
-    // Simulation
     Route::get('simulation', [SimulationController::class, 'index'])->name('simulation.index');
     Route::post('simulation', [SimulationController::class, 'store'])->name('simulation.store');
 
-    // --- PEMBARUAN: Rute untuk Manajemen Izin ---
-    // Menggunakan PermitController yang baru
+    // Manajemen Izin/Permits
     Route::get('permits', [PermitController::class, 'index'])->name('permits.index');
     Route::get('permits/{permit}', [PermitController::class, 'show'])->name('permits.show');
     Route::put('permits/{permit}/status', [PermitController::class, 'updateStatus'])->name('permits.updateStatus');
+
+    // TAMBAHAN BARU: Manajemen Hari Libur
+    Route::get('holidays', [HolidayController::class, 'index'])->name('holidays.index');
+    Route::post('holidays', [HolidayController::class, 'store'])->name('holidays.store');
+    Route::delete('holidays/{holiday}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
+
+    // On/Off Sistem Absensi
+     Route::post('system/toggle', [SystemController::class, 'toggle'])->name('system.toggle');
     // -------------------------------------------
 });
 
-// Catatan: Rute panel siswa dan wali murid sekarang ada di file terpisah (student.php dan guardian.php)
-// Kode di bawah ini mungkin bisa dihapus jika Anda sudah sepenuhnya beralih ke sistem rute baru.
-// Untuk saat ini, saya biarkan agar tidak merusak fungsionalitas yang ada.
+
 Route::middleware(['auth', 'role:siswa,wali'])->prefix('panel')->name('panel.')->group(function () {
     Route::get('/dashboard', [PanelDashboardController::class, 'index'])->name('dashboard');
 
