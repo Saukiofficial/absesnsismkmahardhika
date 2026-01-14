@@ -71,6 +71,25 @@ class User extends Authenticatable
     }
 
     /**
+     * Scope Alias: Agar User::students() (jamak) juga bisa jalan
+     * Memperbaiki jika ada kode yang memanggil versi jamak
+     */
+    public function scopeStudents($query)
+    {
+        return $query->where('role', 'siswa');
+    }
+
+    /**
+     * Scope query untuk mempermudah pengambilan data wali
+     * Digunakan di: GuardianController::index -> User::guardian()
+     * INI YANG MEMPERBAIKI ERROR "Call to undefined method Builder::guardian"
+     */
+    public function scopeGuardian($query)
+    {
+        return $query->where('role', 'wali');
+    }
+
+    /**
      * Relasi: User (Siswa) memiliki banyak Absensi
      */
     public function attendances()
@@ -87,10 +106,27 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi: Siswa memiliki satu Wali
+     * Relasi: Siswa memiliki satu Wali (Parent)
      */
     public function guardian()
     {
         return $this->belongsTo(User::class, 'guardian_id');
+    }
+
+    /**
+     * Relasi: Wali memiliki banyak Siswa (Children)
+     */
+    public function children()
+    {
+        return $this->hasMany(User::class, 'guardian_id');
+    }
+
+    /**
+     * Relasi Alias: Wali memiliki banyak Siswa
+     * Memperbaiki error jika dipanggil $guardian->students()
+     */
+    public function students()
+    {
+        return $this->hasMany(User::class, 'guardian_id');
     }
 }
