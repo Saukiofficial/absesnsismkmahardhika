@@ -29,15 +29,25 @@ class NewAttendance implements ShouldBroadcast
      *
      * @param \App\Models\User $student
      * @param \App\Models\Attendance $attendance
-     * @param bool $isLate // PERUBAHAN 1: Menerima argumen $isLate
+     * @param bool $isLate
      */
     public function __construct(User $student, Attendance $attendance, bool $isLate)
     {
-        // Menentukan URL foto: gunakan foto asli jika ada, jika tidak, gunakan UI Avatars.
-        $photoUrl = $student->photo
-            ? Storage::url($student->photo)
-            // PERBAIKAN: Mengganti placeholder UI Avatars agar lebih konsisten
-            : 'https://placehold.co/128x128/0f0f23/64e5e5?text=' . substr($student->name, 0, 1);
+        // ✅ PERBAIKAN: Generate URL foto dengan benar
+        $photoUrl = null;
+
+        if ($student->photo) {
+            // Cek apakah foto sudah full URL (http/https)
+            if (filter_var($student->photo, FILTER_VALIDATE_URL)) {
+                $photoUrl = $student->photo;
+            } else {
+                // Gunakan asset() untuk generate full URL
+                $photoUrl = asset('storage/' . $student->photo);
+            }
+        } else {
+            // Fallback ke placeholder jika tidak ada foto
+            $photoUrl = 'https://ui-avatars.com/api/?name=' . urlencode($student->name) . '&size=200&background=3b82f6&color=fff&bold=true';
+        }
 
         // Membangun data yang akan dikirim ke halaman monitor
         $this->attendanceData = [
@@ -46,7 +56,7 @@ class NewAttendance implements ShouldBroadcast
             'status' => $attendance->status,
             'time' => $attendance->recorded_at->format('H:i:s'),
             'photo_url' => $photoUrl,
-            'is_late' => $isLate, // PERUBAHAN 2: Menambahkan status terlambat ke data broadcast
+            'is_late' => $isLate,
         ];
     }
 
@@ -57,7 +67,6 @@ class NewAttendance implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        // Menyiarkan event ke channel publik bernama 'attendance-channel'
         return [
             new Channel('attendance-channel'),
         ];
@@ -70,7 +79,6 @@ class NewAttendance implements ShouldBroadcast
      */
     public function broadcastAs()
     {
-        // Memberi nama event agar mudah dikenali oleh frontend (JavaScript)
         return 'new-attendance-event';
     }
 }

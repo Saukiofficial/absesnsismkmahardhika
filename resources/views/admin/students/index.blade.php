@@ -18,218 +18,185 @@
 
                 <div class="flex items-center gap-3">
                     <a href="{{ route('admin.students.import.show') }}"
-                       class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-2xl font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300">
-                        <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+                       class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-2xl font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-emerald-500/30">
+                        <span class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                        <svg class="w-5 h-5 transition-transform duration-300 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                         </svg>
-                        Import Data
+                        <span class="relative">Import</span>
                     </a>
 
                     <a href="{{ route('admin.students.create') }}"
-                       class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105 transition-all duration-300">
-                        <svg class="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                       class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-indigo-500/30">
+                        <span class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                        <svg class="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
-                        Tambah Siswa
+                        <span class="relative">Tambah Siswa</span>
                     </a>
 
-                    <!-- Button Hapus Semua Data -->
-                    <button onclick="confirmDeleteAll()"
-                       class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-semibold shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 transition-all duration-300">
-                        <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                        Hapus Semua Data
-                    </button>
-
-                    <!-- Form Hidden untuk Hapus Semua -->
-                    <form id="deleteAllForm" action="{{ route('admin.students.destroyAll') }}" method="POST" class="hidden">
+                    <!-- Tombol Reset Data -->
+                    <form action="{{ route('admin.students.destroyAll') }}" method="POST" class="inline-block" onsubmit="return confirmDeleteAll()">
                         @csrf
                         @method('DELETE')
+                        <button type="submit" class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-2xl font-semibold shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-red-500/30">
+                            <span class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                            <svg class="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            <span class="relative">Reset Data</span>
+                        </button>
                     </form>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Advanced Filter Section -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl shadow-slate-500/5 border border-white/20 mb-8">
-        <form action="{{ route('admin.students.index') }}" method="GET">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-                <!-- Search Input with Icon -->
-                <div class="lg:col-span-2">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Pencarian</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Alert Section -->
+            @if(session('success'))
+                <div class="mt-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl flex items-center gap-3 animate-fade-in-down">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="font-medium">{{ session('success') }}</span>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center gap-3 animate-fade-in-down">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="font-medium">{{ session('error') }}</span>
+                </div>
+            @endif
+
+            <!-- Search and Filter Section -->
+            <div class="mt-8 bg-white/50 rounded-2xl p-6 border border-white/40">
+                <form action="{{ route('admin.students.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <!-- Search Input -->
+                    <div class="md:col-span-6 lg:col-span-5 relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <input type="text" name="search_name" id="search_name"
-                               value="{{ request('search_name') }}"
-                               placeholder="Nama siswa atau NIS..."
-                               class="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 placeholder-slate-400">
+                        <input type="text" name="search_name" value="{{ $searchName }}"
+                               placeholder="Cari nama atau NIS..."
+                               class="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 placeholder-slate-400 font-medium">
                     </div>
-                </div>
 
-                <!-- Grade Filter -->
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Tingkat</label>
-                    <select name="filter_grade" class="w-full py-3 px-4 rounded-2xl border-2 border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300">
-                        <option value="">Semua Tingkat</option>
-                        @foreach($grades as $grade)
-                            <option value="{{ $grade }}" {{ request('filter_grade') == $grade ? 'selected' : '' }}>{{ $grade }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                    <!-- Grade Filter -->
+                    <div class="md:col-span-3 lg:col-span-2">
+                        <select name="filter_grade" onchange="this.form.submit()"
+                                class="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 font-medium text-slate-600 appearance-none">
+                            <option value="">Semua Kelas</option>
+                            @foreach($grades as $grade)
+                                <option value="{{ $grade }}" {{ $filterGrade == $grade ? 'selected' : '' }}>
+                                    Kelas {{ $grade }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                <!-- Major Filter -->
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Jurusan</label>
-                    <select name="filter_major" class="w-full py-3 px-4 rounded-2xl border-2 border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300">
-                        <option value="">Semua Jurusan</option>
-                        @foreach($majors as $major)
-                            <option value="{{ $major }}" {{ request('filter_major') == $major ? 'selected' : '' }}>{{ $major }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                    <!-- Major Filter -->
+                    <div class="md:col-span-3 lg:col-span-3">
+                        <select name="filter_major" onchange="this.form.submit()"
+                                class="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 font-medium text-slate-600 appearance-none">
+                            <option value="">Semua Jurusan</option>
+                            @foreach($majors as $major)
+                                <option value="{{ $major }}" {{ $filterMajor == $major ? 'selected' : '' }}>
+                                    {{ $major }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                <!-- Action Buttons -->
-                <div class="lg:col-span-2 flex items-end gap-3">
-                    <button type="submit"
-                            class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-2xl font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105 transition-all duration-300">
-                        <span class="flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                            </svg>
-                            Filter
-                        </span>
-                    </button>
-
-                    <a href="{{ route('admin.students.index') }}"
-                       class="flex-1 bg-gradient-to-r from-slate-200 to-slate-300 text-slate-700 py-3 px-6 rounded-2xl font-semibold hover:from-slate-300 hover:to-slate-400 transition-all duration-300 text-center">
-                        Reset
-                    </a>
-                </div>
+                    <!-- Reset Filter Button -->
+                    <div class="md:col-span-12 lg:col-span-2 flex justify-end md:justify-start lg:justify-end">
+                         @if($searchName || $filterGrade || $filterMajor)
+                            <a href="{{ route('admin.students.index') }}" class="inline-flex items-center justify-center w-full px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-medium transition-colors border-2 border-slate-200">
+                                Reset Filter
+                            </a>
+                        @endif
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 
-    <!-- Alert Messages -->
-    @if (session('success'))
-        <div class="mb-6 bg-gradient-to-r from-emerald-50 to-emerald-100 border-2 border-emerald-200 text-emerald-800 px-6 py-4 rounded-2xl shadow-lg shadow-emerald-500/10" role="alert">
-            <div class="flex items-center gap-3">
-                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span class="font-semibold">{{ session('success') }}</span>
-            </div>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="mb-6 bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-200 text-red-800 px-6 py-4 rounded-2xl shadow-lg shadow-red-500/10" role="alert">
-            <div class="flex items-center gap-3">
-                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span class="font-semibold">{{ session('error') }}</span>
-            </div>
-        </div>
-    @endif
-
-    <!-- Data Table with Modern Card Design -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl shadow-slate-500/10 border border-white/20 overflow-hidden">
+    <!-- Table Section -->
+    <div class="bg-white/60 backdrop-blur-sm border border-white/20 rounded-3xl overflow-hidden shadow-xl shadow-indigo-500/5">
         <div class="overflow-x-auto">
-            <table class="min-w-full">
+            <table class="w-full">
                 <thead>
-                    <tr class="bg-gradient-to-r from-slate-800 to-slate-900">
-                        <th class="px-8 py-6 text-left text-sm font-bold text-white uppercase tracking-wider rounded-tl-3xl">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                                Nama Siswa
-                            </div>
-                        </th>
-                        <th class="px-8 py-6 text-left text-sm font-bold text-white uppercase tracking-wider">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                </svg>
-                                Email
-                            </div>
-                        </th>
-                        <th class="px-8 py-6 text-left text-sm font-bold text-white uppercase tracking-wider">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                </svg>
-                                NIS
-                            </div>
-                        </th>
-                        <th class="px-8 py-6 text-left text-sm font-bold text-white uppercase tracking-wider">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                </svg>
-                                Kelas
-                            </div>
-                        </th>
-                        <th class="px-8 py-6 text-right text-sm font-bold text-white uppercase tracking-wider rounded-tr-3xl">
-                            Aksi
-                        </th>
+                    <tr class="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+                        <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Siswa</th>
+                        <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">NIS</th>
+                        <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Kelas & Jurusan</th>
+                        <th class="px-8 py-5 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @forelse ($students as $index => $student)
-                        <tr class="group hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-all duration-300">
-                            <td class="px-8 py-6">
+                    @forelse($students as $student)
+                        <tr class="hover:bg-indigo-50/30 transition-colors duration-300 group">
+                            <td class="px-8 py-5">
                                 <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-12 w-12">
-                                        <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                                            <span class="text-white font-bold text-lg">{{ strtoupper(substr($student->name, 0, 1)) }}</span>
+                                    <div class="relative">
+                                        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-[2px] shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
+                                            <!-- PERBAIKAN LOGIKA FOTO DI SINI -->
+                                            @php
+                                                // Bersihkan path foto dari 'public/' jika ada, karena storage link sudah mapping ke public
+                                                $photoPath = $student->photo ? str_replace('public/', '', $student->photo) : null;
+                                            @endphp
+
+                                            @if($photoPath && Storage::disk('public')->exists($photoPath))
+                                                <img class="h-full w-full rounded-xl object-cover border-2 border-white"
+                                                     src="{{ asset('storage/' . $photoPath) }}"
+                                                     alt="{{ $student->name }}"
+                                                     onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode($student->name) }}&background=random';">
+                                            @else
+                                                <div class="h-full w-full rounded-xl bg-white flex items-center justify-center">
+                                                    <span class="text-indigo-600 font-bold text-lg">{{ substr($student->name, 0, 1) }}</span>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-bold text-slate-900">{{ $student->name }}</div>
-                                        <div class="text-sm text-slate-500">Student ID: {{ $student->id }}</div>
+                                        <div class="text-sm font-bold text-slate-800">{{ $student->name }}</div>
+                                        <div class="text-xs text-slate-500 font-medium">{{ $student->email }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-8 py-6">
-                                <div class="text-sm font-semibold text-slate-900">{{ $student->email }}</div>
-                                <div class="text-sm text-slate-500">Active Account</div>
-                            </td>
-                            <td class="px-8 py-6">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 shadow-sm">
+                            <td class="px-8 py-5">
+                                <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                                     {{ $student->nis }}
                                 </span>
                             </td>
-                            <td class="px-8 py-6">
-                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-800 shadow-sm">
-                                    {{ $student->class }}
-                                </span>
+                            <td class="px-8 py-5">
+                                <div class="flex flex-col gap-1">
+                                    @php
+                                        // Memisahkan kelas dan jurusan
+                                        $parts = explode(' ', $student->class, 2);
+                                        $grade = $parts[0] ?? '';
+                                        $major = $parts[1] ?? $student->class;
+                                    @endphp
+                                    <span class="text-sm font-bold text-slate-700">{{ $grade }}</span>
+                                    <span class="text-xs text-slate-500 font-medium">{{ $major }}</span>
+                                </div>
                             </td>
-                            <td class="px-8 py-6 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('admin.students.edit', $student) }}"
-                                       class="group inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-105 transition-all duration-300">
-                                        <svg class="w-4 h-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <td class="px-8 py-5">
+                                <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                                    <a href="{{ route('admin.students.edit', $student) }}" class="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 hover:scale-110 transition-all duration-300 border border-amber-200" title="Edit">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                         </svg>
-                                        Edit
                                     </a>
-
-                                    <form action="{{ route('admin.students.destroy', $student) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                                    <form action="{{ route('admin.students.destroy', $student) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data siswa ini?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit"
-                                                class="group inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 transition-all duration-300">
-                                            <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <button type="submit" class="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 hover:scale-110 transition-all duration-300 border border-red-200" title="Hapus">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                             </svg>
-                                            Hapus
                                         </button>
                                     </form>
                                 </div>
@@ -237,17 +204,15 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-8 py-12 text-center">
-                                <div class="flex flex-col items-center gap-4">
-                                    <div class="w-24 h-24 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full flex items-center justify-center">
-                                        <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"/>
+                            <td colspan="4" class="px-8 py-16 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <div class="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mb-4 border-2 border-slate-100">
+                                        <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                                         </svg>
                                     </div>
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-slate-600 mb-2">Tidak ada data siswa</h3>
-                                        <p class="text-slate-500">Data siswa tidak ditemukan dengan filter yang dipilih</p>
-                                    </div>
+                                    <h3 class="text-lg font-bold text-slate-800 mb-1">Belum ada data siswa</h3>
+                                    <p class="text-slate-500">Silakan tambahkan data manual atau import dari Excel</p>
                                 </div>
                             </td>
                         </tr>
@@ -295,11 +260,13 @@ function confirmDeleteAll() {
     if (confirm('⚠️ PERINGATAN!\n\nApakah Anda yakin ingin menghapus SEMUA data siswa?\n\nTindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data siswa beserta foto-foto mereka.\n\nKetik "HAPUS SEMUA" untuk melanjutkan.')) {
         const userInput = prompt('Ketik "HAPUS SEMUA" (tanpa tanda kutip) untuk mengkonfirmasi:');
         if (userInput === 'HAPUS SEMUA') {
-            document.getElementById('deleteAllForm').submit();
+            return true;
         } else {
-            alert('Konfirmasi gagal. Data tidak dihapus.');
+            alert('Konfirmasi salah. Penghapusan dibatalkan.');
+            return false;
         }
     }
+    return false;
 }
 </script>
 @endsection
