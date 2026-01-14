@@ -34,7 +34,6 @@
                 <div class="flex-shrink-0"><svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg></div>
                 <div class="ml-3">
                     <h3 class="text-sm font-medium text-red-800">Gagal Mengimpor:</h3>
-                    <!-- Menggunakan {!! !!} agar baris baru (<br>) dari Controller terbaca -->
                     <div class="mt-2 text-sm text-red-700">{!! session('error') !!}</div>
                 </div>
             </div>
@@ -66,7 +65,8 @@
                                 <p class="text-slate-500 text-sm">Gunakan template ini untuk menghindari kesalahan format.</p>
                             </div>
                         </div>
-                        <a href="{{ route('admin.students.download-template') }}" class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm">
+                        <!-- PERBAIKAN DI SINI: Mengganti route ke admin.students.import.template -->
+                        <a href="{{ route('admin.students.import.template') }}" class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4 4m4-4v12"/></svg>
                             Download Template
                         </a>

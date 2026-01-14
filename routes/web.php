@@ -2,34 +2,27 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+// Controller Admin
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\Admin\SimulationController;
-use App\Http\Controllers\Panel\DashboardController as PanelDashboardController;
-use App\Http\Controllers\Panel\LeaveController;
 use App\Http\Controllers\Admin\StudentImportController;
-use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\Admin\GuardianImportExportController;
-
-// --- PERBAIKAN ---
-// 1. Hapus 'use' statement yang menyebabkan error
-// use App\Http\Controllers\Admin\AbsencePermitController;
-
 use App\Http\Controllers\Admin\PermitController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\SystemController;
-
-
+// Controller Panel (Siswa/Wali)
+use App\Http\Controllers\Panel\DashboardController as PanelDashboardController;
+use App\Http\Controllers\Panel\LeaveController;
+// Controller Umum
+use App\Http\Controllers\MonitorController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| This is where you can register web routes for your application.
-|
 */
 
 // Rute untuk Halaman Monitor Absensi (dapat diakses publik)
@@ -40,51 +33,71 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Laravel Breeze Authentication Routes are included here
+// Laravel Breeze Authentication Routes
 require __DIR__.'/auth.php';
 
-// Rute "Gerbang" setelah login
+// Rute "Gerbang" setelah login untuk mengarahkan user sesuai role
 Route::get('/dashboard', function () {
     $user = Auth::user();
-    if ($user->role === 'admin') {
+    if ($user->hasRole('admin')) {
         return redirect()->route('admin.dashboard');
+    } elseif ($user->hasRole('siswa') || $user->hasRole('wali')) {
+        return redirect()->route('panel.dashboard');
     }
-    // Perbaikan kecil: Arahkan ke rute yang lebih spesifik jika memungkinkan
-    if ($user->role === 'siswa') {
-        return redirect()->route('student.dashboard');
-    }
-    if ($user->role === 'wali') {
-        return redirect()->route('guardian.dashboard');
-    }
-    // Default fallback
-    return redirect()->route('login');
-})->middleware(['auth'])->name('dashboard');
+    return abort(403);
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-// Admin Panel Routes
+
+// ====================================================
+// GROUP ROUTE ADMIN
+// ====================================================
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Dashboard Admin
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    // Rute untuk Fitur Impor Siswa
+    // --- MANAJEMEN ABSENSI (ATTENDANCE) ---
+    // 1. Route Export Excel (WAJIB DITARUH PALING ATAS di grup attendance)
+    Route::get('attendances/export', [AdminAttendanceController::class, 'export'])->name('attendances.export');
+
+    // 2. Route Detail Siswa untuk Sidebar Preview (AJAX)
+    Route::get('attendances/{student}/detail', [AdminAttendanceController::class, 'getStudentDetail'])->name('attendances.detail');
+
+    // 3. Route Tampilan Tabel (Index)
+    // Dibuat 2 jalur agar kompatibel dengan link sidebar lama & kode baru
+    Route::get('attendance', [AdminAttendanceController::class, 'index'])->name('attendance.index');   // Jalur Tunggal
+    Route::get('attendances', [AdminAttendanceController::class, 'index'])->name('attendances.index'); // Jalur Jamak (Standar)
+
+
+    // --- MANAJEMEN SISWA ---
+    // 1. Import Siswa & Template
     Route::get('students/import', [StudentImportController::class, 'show'])->name('students.import.show');
     Route::post('students/import', [StudentImportController::class, 'store'])->name('students.import.store');
     Route::get('students/import/template', [StudentImportController::class, 'downloadTemplate'])->name('students.import.template');
 
-    // Student Management
+    // 2. Hapus Semua Siswa (Reset Data) - Letakkan SEBELUM resource students
+    // Menggunakan nama 'students.destroyAll' sesuai permintaan error sebelumnya
+    Route::delete('students/destroy-all', [StudentController::class, 'destroyAll'])->name('students.destroyAll');
+
+    // 3. Resource Students (CRUD Siswa)
     Route::resource('students', StudentController::class);
 
-    // Rute untuk Fitur Impor & Ekspor Wali Murid
+
+    // --- MANAJEMEN WALI (GUARDIAN) ---
+    // 1. Import/Export Wali
     Route::get('guardians/import', [GuardianImportExportController::class, 'showImportForm'])->name('guardians.import.show');
-    Route::post('guardians/import', [GuardianImportExportController::class, 'storeImport'])->name('guardians.import.store');
-    Route::get('guardians/import/template', [GuardianImportExportController::class, 'downloadTemplate'])->name('guardians.import.template');
+    Route::post('guardians/import', [GuardianImportExportController::class, 'import'])->name('guardians.import.store');
     Route::get('guardians/export', [GuardianImportExportController::class, 'export'])->name('guardians.export');
 
-    Route::get('/guardians/search', [GuardianController::class, 'search'])->name('guardians.search');
+    // 2. Hapus Semua Wali
+    Route::delete('guardians/destroy-all', [GuardianController::class, 'destroyAll'])->name('guardians.destroyAll');
 
+    // 3. Resource Guardians
     Route::resource('guardians', GuardianController::class);
 
-    Route::get('attendances', [AdminAttendanceController::class, 'index'])->name('attendances.index');
-    Route::get('attendances/export', [AdminAttendanceController::class, 'export'])->name('attendances.export');
 
+    // --- FITUR LAINNYA ---
+    // Simulasi RFID (Development Only)
     Route::get('simulation', [SimulationController::class, 'index'])->name('simulation.index');
     Route::post('simulation', [SimulationController::class, 'store'])->name('simulation.store');
 
@@ -93,20 +106,23 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('permits/{permit}', [PermitController::class, 'show'])->name('permits.show');
     Route::put('permits/{permit}/status', [PermitController::class, 'updateStatus'])->name('permits.updateStatus');
 
-    // TAMBAHAN BARU: Manajemen Hari Libur
+    // Manajemen Hari Libur
     Route::get('holidays', [HolidayController::class, 'index'])->name('holidays.index');
     Route::post('holidays', [HolidayController::class, 'store'])->name('holidays.store');
     Route::delete('holidays/{holiday}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
 
-    // On/Off Sistem Absensi
-     Route::post('system/toggle', [SystemController::class, 'toggle'])->name('system.toggle');
-    // -------------------------------------------
+    // On/Off Sistem Absensi (Global Switch)
+    Route::post('system/toggle', [SystemController::class, 'toggle'])->name('system.toggle');
 });
 
 
+// ====================================================
+// GROUP ROUTE PANEL (SISWA & WALI)
+// ====================================================
 Route::middleware(['auth', 'role:siswa,wali'])->prefix('panel')->name('panel.')->group(function () {
     Route::get('/dashboard', [PanelDashboardController::class, 'index'])->name('dashboard');
 
+    // Group Khusus Siswa (Pengajuan Izin)
     Route::middleware('role:siswa')->prefix('leaves')->name('leaves.')->group(function () {
         Route::get('/', [LeaveController::class, 'index'])->name('index');
         Route::get('/create', [LeaveController::class, 'create'])->name('create');

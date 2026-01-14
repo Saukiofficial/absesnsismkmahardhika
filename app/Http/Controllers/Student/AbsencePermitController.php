@@ -48,9 +48,7 @@ class AbsencePermitController extends Controller
         ]);
     }
 
-    /**
-     * Menyimpan pengajuan izin yang baru ke database.
-     */
+
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([

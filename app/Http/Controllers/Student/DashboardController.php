@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use Carbon\Carbon; // 1. Import Carbon
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -32,19 +32,16 @@ class DashboardController extends Controller
                                       ->whereBetween('recorded_at', [$startOfMonth, $today])
                                       ->get();
 
-        // PERBAIKAN ERROR: Tambahkan $today ke 'use'
         $monthlyApprovedPermitsCount = $student->absencePermits()
                             ->where('status', 'disetujui')
-                            ->where(function($query) use ($startOfMonth, $today) { // <--- $today DITAMBAHKAN DI SINI
+                            ->where(function($query) use ($startOfMonth, $today) {
                                 // Cek izin yang mencakup bulan ini
                                 $query->whereDate('start_date', '<=', $today)
                                       ->whereDate('end_date', '>=', $startOfMonth);
                             })
                             ->count();
 
-        // 3. Hitung STATS
-
-        // HADIR (Hari unik siswa melakukan absensi 'in')
+        // HADIR (Menghitung berapa hari unik siswa melakukan absensi 'in')
         $hadirCount = $monthlyAttendances
                         ->where('status', 'in')
                         ->unique(fn($item) => $item->recorded_at->format('Y-m-d'))
@@ -53,11 +50,24 @@ class DashboardController extends Controller
         // IZIN (Total izin yang disetujui)
         $izinCount = $monthlyApprovedPermitsCount;
 
-        // ALPA (Total hari sekolah (Senin-Sabtu) dikurangi hadir & izin)
+        // ALPA (Total hari sekolah dikurangi hadir & izin)
 
-        // Hitung total hari sekolah (Senin-Sabtu) dari awal bulan sampai hari ini
+        // --- PERBAIKAN LOGIKA ALPA ---
+        // Masalah: Kalau siswa baru masuk tgl 12, jangan hitung tgl 1-11 sebagai Alpa.
+        // Solusi: Start perhitungan hari sekolah dimulai dari 'created_at' siswa jika ia baru masuk bulan ini.
+
+        $calculationStartDate = $startOfMonth->clone();
+
+        // Jika siswa dibuat/diinput SETELAH awal bulan ini, maka hitungan mulai dari tanggal dia dibuat
+        if ($student->created_at && $student->created_at > $startOfMonth) {
+            $calculationStartDate = $student->created_at->startOfDay();
+        }
+
+        // Hitung total hari sekolah (Senin-Sabtu) dari Tanggal Mulai Hitung sampai Hari Ini
         $schoolDays = 0;
-        $dateIterator = $startOfMonth->clone();
+        $dateIterator = $calculationStartDate->clone();
+
+        // Pastikan iterator tidak melebihi hari ini (mencegah loop aneh jika jam server beda)
         while ($dateIterator <= $today) {
             // Hanya hitung jika BUKAN hari Minggu
             if (!$dateIterator->isSunday()) {
@@ -68,14 +78,16 @@ class DashboardController extends Controller
 
         // Alpa = Total Hari Sekolah - Hadir - Izin
         $alpaCount = $schoolDays - $hadirCount - $izinCount;
+
+        // Pastikan tidak negatif (jaga-jaga jika ada data aneh)
         if ($alpaCount < 0) {
-            $alpaCount = 0; // Pastikan tidak negatif
+            $alpaCount = 0;
         }
 
         $attendanceSummary = [
             'hadir' => $hadirCount,
             'izin'  => $izinCount,
-            'alpa'  => $alpaCount, // Data baru untuk Alpa
+            'alpa'  => $alpaCount,
         ];
         // --- AKHIR PERBAIKAN ---
 

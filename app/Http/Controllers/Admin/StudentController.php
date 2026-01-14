@@ -14,17 +14,24 @@ class StudentController extends Controller
 {
     /**
      * Helper untuk menyediakan data kelas dan jurusan.
+     * UPDATE: Daftar jurusan disesuaikan dengan kebutuhan terbaru (ada nomor kelas).
      */
     private function getClassData(): array
     {
         return [
             'grades' => ['X', 'XI', 'XII'],
             'majors' => [
-                'AKUNTANSI',
+                'AKUNTANSI 1',
+                'AKUNTANSI 2',
+                'MANAJEMEN PERKANTORAN 1',
+                'MANAJEMEN PERKANTORAN 2',
+                'MANAJEMEN PERKANTORAN 3',
+                'MANAJEMEN PERKANTORAN 4',
+                'DESAIN KOMUNIKASI VISUAL 1',
+                'DESAIN KOMUNIKASI VISUAL 2',
+                'PRODUKSI & SIARAN PROGRAM TELEVISI 1',
+                'PRODUKSI & SIARAN PROGRAM TELEVISI 2',
                 'ANIMASI',
-                'DESAIN KOMUNIKASI VISUAL',
-                'MANAJEMEN PERKANTORAN',
-                'PRODUKSI SIARAN PROGRAM TELEVISI',
             ]
         ];
     }
@@ -50,98 +57,117 @@ class StudentController extends Controller
 
         // Filter berdasarkan tingkat kelas (contoh: 'X %')
         if ($filterGrade) {
-            $query->where('class', 'like', $filterGrade . ' %');
+            $query->where('class', 'like', "{$filterGrade} %");
         }
 
-        // Filter berdasarkan jurusan (contoh: '% AKUNTANSI')
+        // Filter berdasarkan jurusan (contoh: '% ANIMASI')
         if ($filterMajor) {
-            $query->where('class', 'like', '% ' . $filterMajor);
+            // Karena jurusan ada di bagian belakang string kelas (misal "X AKUNTANSI 1")
+            $query->where('class', 'like', "% {$filterMajor}");
         }
 
-        $students = $query->latest()->paginate(10)->appends($request->all());
+        $students = $query->orderBy('name', 'asc')
+                          ->paginate(10)
+                          ->withQueryString();
 
-        // Mengirim data kelas dan jurusan untuk dropdown filter
-        return view('admin.students.index', array_merge(
-            compact('students'),
-            $this->getClassData()
-        ));
+        $classData = $this->getClassData();
+
+        return view('admin.students.index', array_merge([
+            'students' => $students,
+            'searchName' => $searchName,
+            'filterGrade' => $filterGrade,
+            'filterMajor' => $filterMajor,
+        ], $classData));
     }
 
     /**
      * Menampilkan form untuk membuat siswa baru.
+     * MENGGUNAKAN SATU VIEW FORM (admin.students.form)
      */
     public function create()
     {
-        $pageTitle = 'Tambah Siswa';
-        $guardians = User::query()->guardian()->orderBy('name')->get();
-        return view('admin.students.form', array_merge(
-            compact('pageTitle', 'guardians'),
-            $this->getClassData()
-        ));
+        $guardians = User::where('role', 'wali')->orderBy('name')->get();
+
+        return view('admin.students.form', array_merge($this->getClassData(), [
+            'guardians' => $guardians,
+            'student' => new User(), // Kirim objek kosong agar form tidak error saat akses properti
+            'pageTitle' => 'Tambah Data Siswa',
+            'isEdit' => false,
+            'currentGrade' => '',
+            'currentMajor' => '',
+        ]));
     }
 
     /**
-     * Menyimpan siswa baru ke database.
+     * Menyimpan siswa baru yang baru dibuat ke dalam database.
      */
     public function store(Request $request)
     {
-        $classData = $this->getClassData();
+        // 1. Validasi Input
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'nis' => ['required', 'string', 'max:20', 'unique:'.User::class],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'nis' => ['required', 'string', 'max:255', 'unique:'.User::class],
-            'grade' => ['required', Rule::in($classData['grades'])],
-            'major' => ['required', Rule::in($classData['majors'])],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'grade' => ['required', 'string'],
+            'major' => ['required', 'string'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:10240'], // Max 10MB
             'card_uid' => ['nullable', 'string', 'max:255', 'unique:'.User::class],
-            'fingerprint_id' => ['nullable', 'string', 'max:255', 'unique:'.User::class],
             'guardian_id' => ['required', 'exists:users,id'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $data = $request->except('password', 'photo', 'grade', 'major');
-        $data['password'] = Hash::make($request->password);
-        $data['role'] = 'siswa';
-        // Menggabungkan Grade dan Major menjadi satu string "class"
-        $data['class'] = $request->grade . ' ' . $request->major;
+        try {
+            // 2. Bersihkan Data Request dari field yang tidak perlu disimpan langsung
+            $data = $request->except(['password', 'photo', 'grade', 'major', 'password_confirmation', '_token']);
 
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('photos', 'public');
+            // 3. Format Data Tambahan
+            // Menggabungkan Grade dan Major menjadi satu string 'class'
+            $data['class'] = $request->grade . ' ' . $request->major;
+            $data['role'] = 'siswa';
+            $data['password'] = Hash::make($request->password);
+
+            // Pastikan card_uid benar-benar NULL jika kosong (mencegah error duplikat string kosong)
+            $data['card_uid'] = $request->filled('card_uid') ? $request->card_uid : null;
+
+            // 4. Upload Foto Jika Ada
+            if ($request->hasFile('photo')) {
+                $data['photo'] = $request->file('photo')->store('photos', 'public');
+            }
+
+            // 5. Simpan ke Database
+            User::create($data);
+
+            return redirect()->route('admin.students.index')->with('success', 'Siswa berhasil ditambahkan.');
+
+        } catch (\Exception $e) {
+            // Jika terjadi error, kembali ke form dengan pesan error yang jelas
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal menambah siswa: ' . $e->getMessage());
         }
-
-        User::create($data);
-
-        return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil ditambahkan.');
     }
 
     /**
      * Menampilkan form untuk mengedit data siswa.
+     * MENGGUNAKAN SATU VIEW FORM (admin.students.form)
      */
     public function edit(User $student)
     {
-        $pageTitle = 'Edit Siswa: ' . $student->name;
-        $guardians = User::query()->guardian()->orderBy('name')->get();
+        // Memecah string 'class' kembali menjadi Grade dan Major untuk form edit
+        $parts = explode(' ', $student->class, 2);
+        $currentGrade = $parts[0] ?? '';
+        $currentMajor = $parts[1] ?? '';
 
-        // --- PERBAIKAN LOGIKA UNTUK FORM EDIT ---
-        // Memecah string 'class' dan membersihkan spasi (trim)
-        // Agar "X  AKUNTANSI" (dobel spasi) tetap terbaca sebagai "X" dan "AKUNTANSI"
-        if ($student->class) {
-            // Limit 2 digunakan agar jurusan yang mengandung spasi tidak terpotong salah
-            $parts = explode(' ', $student->class, 2);
+        $guardians = User::where('role', 'wali')->orderBy('name')->get();
 
-            if (count($parts) === 2) {
-                $student->grade = trim($parts[0]); // Tambahkan trim()
-                $student->major = trim($parts[1]); // Tambahkan trim()
-            } elseif (count($parts) === 1) {
-                // Jaga-jaga jika formatnya salah (hanya kelas atau jurusan)
-                $student->grade = trim($parts[0]);
-            }
-        }
-
-        return view('admin.students.form', array_merge(
-            compact('pageTitle', 'student', 'guardians'),
-            $this->getClassData()
-        ));
+        return view('admin.students.form', array_merge([
+            'student' => $student,
+            'currentGrade' => $currentGrade,
+            'currentMajor' => $currentMajor,
+            'guardians' => $guardians,
+            'pageTitle' => 'Edit Data Siswa',
+            'isEdit' => true,
+        ], $this->getClassData()));
     }
 
     /**
@@ -149,38 +175,47 @@ class StudentController extends Controller
      */
     public function update(Request $request, User $student)
     {
-        $classData = $this->getClassData();
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class.',email,'.$student->id],
-            'nis' => ['required', 'string', 'max:255', 'unique:'.User::class.',nis,'.$student->id],
-            'grade' => ['required', Rule::in($classData['grades'])],
-            'major' => ['required', Rule::in($classData['majors'])],
+            'nis' => ['required', 'string', 'max:20', Rule::unique(User::class)->ignore($student->id)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($student->id)],
+            'grade' => ['required', 'string'],
+            'major' => ['required', 'string'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:10240'],
             'card_uid' => ['nullable', 'string', 'max:255', 'unique:'.User::class.',card_uid,'.$student->id],
-            'fingerprint_id' => ['nullable', 'string', 'max:255', 'unique:'.User::class.',fingerprint_id,'.$student->id],
             'guardian_id' => ['required', 'exists:users,id'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $data = $request->except('password', 'photo', 'grade', 'major');
-        // Menggabungkan kembali Grade dan Major saat update
-        $data['class'] = $request->grade . ' ' . $request->major;
+        try {
+            $data = $request->except(['password', 'photo', 'grade', 'major', 'password_confirmation', '_token']);
 
-        if ($request->hasFile('photo')) {
-            if ($student->photo) {
-                Storage::disk('public')->delete($student->photo);
+            // Menggabungkan kembali Grade dan Major saat update
+            $data['class'] = $request->grade . ' ' . $request->major;
+
+            // Pastikan card_uid benar-benar NULL jika kosong
+            $data['card_uid'] = $request->filled('card_uid') ? $request->card_uid : null;
+
+            if ($request->hasFile('photo')) {
+                if ($student->photo) {
+                    Storage::disk('public')->delete($student->photo);
+                }
+                $data['photo'] = $request->file('photo')->store('photos', 'public');
             }
-            $data['photo'] = $request->file('photo')->store('photos', 'public');
+
+            if ($request->filled('password')) {
+                $data['password'] = Hash::make($request->password);
+            }
+
+            $student->update($data);
+
+            return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil diperbarui.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal update siswa: ' . $e->getMessage());
         }
-
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
-        }
-
-        $student->update($data);
-
-        return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil diperbarui.');
     }
 
     /**
@@ -193,5 +228,35 @@ class StudentController extends Controller
         }
         $student->delete();
         return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil dihapus.');
+    }
+
+    /**
+     * Menghapus SEMUA data siswa dari database.
+     */
+    public function destroyAll()
+    {
+        try {
+            // Ambil semua siswa
+            $students = User::student()->get();
+
+            // Hapus foto-foto siswa dari storage
+            foreach ($students as $student) {
+                if ($student->photo) {
+                    Storage::disk('public')->delete($student->photo);
+                }
+            }
+
+            // Hapus semua data siswa
+            $deletedCount = User::student()->delete();
+
+            return redirect()
+                ->route('admin.students.index')
+                ->with('success', "Berhasil menghapus {$deletedCount} data siswa.");
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.students.index')
+                ->with('error', 'Terjadi kesalahan saat menghapus data siswa.');
+        }
     }
 }

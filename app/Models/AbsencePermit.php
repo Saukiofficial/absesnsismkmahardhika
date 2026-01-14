@@ -4,42 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AbsencePermit extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'user_id',
-        'permit_type',
+        'permit_type', // sakit, izin
         'start_date',
         'end_date',
         'reason',
         'attachment',
-        'status',
-        'approved_by',
+        'status', // pending, disetujui, ditolak
+        'notes',  // catatan admin
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
     /**
-     * Get the student (user) that owns the permit.
+     * Relasi ke User (Siswa)
+     * Fungsi ini WAJIB ADA agar tidak error saat export data izin
      */
-    public function student(): BelongsTo
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    /**
-     * Get the admin (user) who approved or rejected the permit.
-     */
-    public function approver(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->belongsTo(User::class);
     }
 }
-

@@ -32,6 +32,21 @@
                         </svg>
                         Tambah Siswa
                     </a>
+
+                    <!-- Button Hapus Semua Data -->
+                    <button onclick="confirmDeleteAll()"
+                       class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-semibold shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 transition-all duration-300">
+                        <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Hapus Semua Data
+                    </button>
+
+                    <!-- Form Hidden untuk Hapus Semua -->
+                    <form id="deleteAllForm" action="{{ route('admin.students.destroyAll') }}" method="POST" class="hidden">
+                        @csrf
+                        @method('DELETE')
+                    </form>
                 </div>
             </div>
         </div>
@@ -274,4 +289,17 @@
         @apply bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed;
     }
 </style>
+
+<script>
+function confirmDeleteAll() {
+    if (confirm('⚠️ PERINGATAN!\n\nApakah Anda yakin ingin menghapus SEMUA data siswa?\n\nTindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data siswa beserta foto-foto mereka.\n\nKetik "HAPUS SEMUA" untuk melanjutkan.')) {
+        const userInput = prompt('Ketik "HAPUS SEMUA" (tanpa tanda kutip) untuk mengkonfirmasi:');
+        if (userInput === 'HAPUS SEMUA') {
+            document.getElementById('deleteAllForm').submit();
+        } else {
+            alert('Konfirmasi gagal. Data tidak dihapus.');
+        }
+    }
+}
+</script>
 @endsection

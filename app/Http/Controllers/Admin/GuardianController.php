@@ -99,6 +99,35 @@ class GuardianController extends Controller
     }
 
     /**
+     * Menghapus SEMUA data wali murid dari database.
+     */
+    public function destroyAll()
+    {
+        try {
+            // Cek apakah ada wali murid yang masih memiliki siswa
+            $guardiansWithStudents = User::query()->guardian()->has('students')->count();
+
+            if ($guardiansWithStudents > 0) {
+                return redirect()
+                    ->route('admin.guardians.index')
+                    ->with('error', "Tidak dapat menghapus semua data. Terdapat {$guardiansWithStudents} wali murid yang masih memiliki siswa terdaftar. Hapus data siswa terlebih dahulu.");
+            }
+
+            // Hapus semua data wali murid yang tidak memiliki siswa
+            $deletedCount = User::query()->guardian()->delete();
+
+            return redirect()
+                ->route('admin.guardians.index')
+                ->with('success', "Berhasil menghapus {$deletedCount} data wali murid.");
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.guardians.index')
+                ->with('error', 'Terjadi kesalahan saat menghapus data wali murid.');
+        }
+    }
+
+    /**
      * Menangani permintaan pencarian wali murid (AJAX) dari form siswa.
      */
     public function search(Request $request)
