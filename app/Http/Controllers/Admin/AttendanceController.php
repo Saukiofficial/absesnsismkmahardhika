@@ -38,9 +38,6 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * Export data ke Excel.
-     */
     public function export(Request $request)
     {
         $processedAttendances = $this->getFilteredAttendances($request);
@@ -49,12 +46,9 @@ class AttendanceController extends Controller
         return Excel::download(new AttendancesExport($processedAttendances), $fileName);
     }
 
-    /**
-     * Logika Inti Pemrosesan Data Absensi & Izin
-     */
     private function getFilteredAttendances(Request $request)
     {
-        // 1. Tentukan Range Tanggal (Default: Semester Ini)
+        // 1. Tentukan Range Tanggal
         $startDate = null;
         $endDate = null;
 
@@ -62,27 +56,25 @@ class AttendanceController extends Controller
             $startDate = Carbon::parse($request->start_date)->startOfDay();
             $endDate = Carbon::parse($request->end_date)->endOfDay();
         } else {
-            // Logika Semester Otomatis
+            // Default: Semester Ini
             $currentMonth = Carbon::now()->month;
             $currentYear = Carbon::now()->year;
             if ($currentMonth >= 7) {
-                // Semester Ganjil (Juli - Des)
                 $startDate = Carbon::create($currentYear, 7, 1)->startOfDay();
                 $endDate = Carbon::create($currentYear, 12, 31)->endOfDay();
             } else {
-                // Semester Genap (Jan - Jun)
                 $startDate = Carbon::create($currentYear, 1, 1)->startOfDay();
                 $endDate = Carbon::create($currentYear, 6, 30)->endOfDay();
             }
         }
 
-        // PENTING: Jangan ambil data masa depan (cegah tgl 14 muncul di tgl 13)
+        // Cegah data masa depan
         $todayEnd = Carbon::now()->endOfDay();
         if ($endDate > $todayEnd) {
             $endDate = $todayEnd;
         }
 
-        // 2. Query Data HADIR (Attendance)
+        // 2. Query Data HADIR
         $attendanceQuery = Attendance::with('user')
             ->whereBetween('recorded_at', [$startDate, $endDate]);
 
@@ -93,7 +85,7 @@ class AttendanceController extends Controller
         }
         $attendances = $attendanceQuery->orderBy('recorded_at', 'desc')->get();
 
-        // 3. Query Data IZIN/SAKIT (AbsencePermit)
+        // 3. Query Data IZIN/SAKIT
         $permitQuery = AbsencePermit::with('user')
             ->where('status', 'disetujui')
             ->where(function($q) use ($startDate, $endDate) {
@@ -121,7 +113,6 @@ class AttendanceController extends Controller
         });
 
         foreach ($groupedAttendances as $key => $group) {
-            // Cari data IN dan OUT (Case Insensitive agar 'IN', 'In', 'in' terbaca semua)
             $checkIn = $group->first(function ($item) {
                 return strtolower($item->status) === 'in' || strtolower($item->status) === 'masuk';
             });
@@ -131,8 +122,6 @@ class AttendanceController extends Controller
 
             $user = $group->first()->user;
 
-            // FILTER HANTU: Hanya masukkan data jika User Ada DAN (Ada In ATAU Ada Out)
-            // Ini akan membuang baris yang jamnya kosong semua (penyebab -- -- Tepat Waktu)
             if ($user && ($checkIn || $checkOut)) {
                  $processedData[] = [
                     'sort_date' => $group->first()->recorded_at->timestamp,
@@ -151,17 +140,14 @@ class AttendanceController extends Controller
             }
         }
 
-        // B. Masukkan Data Izin (Looping range tanggal izin)
+        // B. Masukkan Data Izin
         foreach ($permits as $permit) {
             $periodStart = Carbon::parse($permit->start_date);
             $periodEnd = Carbon::parse($permit->end_date);
-
-            // Batasi loop agar tidak keluar dari filter yang dipilih user
             $loopStart = $periodStart->max($startDate);
             $loopEnd = $periodEnd->min($endDate);
 
             while ($loopStart <= $loopEnd) {
-                // Skip Hari Minggu
                 if (!$loopStart->isSunday()) {
                     $processedData[] = [
                         'sort_date' => $loopStart->timestamp,
@@ -173,7 +159,7 @@ class AttendanceController extends Controller
                         'class' => $permit->user ? $permit->user->class : '-',
                         'check_in' => '-',
                         'check_out' => '-',
-                        'status_in' => ucfirst($permit->permit_type), // Izin/Sakit
+                        'status_in' => ucfirst($permit->permit_type),
                         'status_out' => '-',
                         'keterangan' => ucfirst($permit->permit_type),
                     ];
@@ -182,7 +168,6 @@ class AttendanceController extends Controller
             }
         }
 
-        // 5. Sorting Akhir (Tanggal Terbaru -> Nama A-Z)
         usort($processedData, function ($a, $b) {
             if ($a['sort_date'] == $b['sort_date']) {
                 return strcmp($a['user_name'], $b['user_name']);
@@ -194,18 +179,30 @@ class AttendanceController extends Controller
     }
 
     /**
-     * API untuk mengambil detail statistik siswa (Sidebar Preview)
+     * API Detail Siswa (Sidebar) - SEKARANG MENGGUNAKAN LOGIKA SEMESTER
      */
     public function getStudentDetail(User $student)
     {
-        $startOfMonth = Carbon::now()->startOfMonth();
         $today = Carbon::now();
+        $currentMonth = $today->month;
+        $currentYear = $today->year;
 
-        $calculationStartDate = $startOfMonth->clone();
-        if ($student->created_at && $student->created_at > $startOfMonth) {
+        // 1. Tentukan Awal Semester (Ganjil/Genap)
+        if ($currentMonth >= 7) {
+            // Semester Ganjil (Mulai 1 Juli)
+            $startPeriod = Carbon::create($currentYear, 7, 1)->startOfDay();
+        } else {
+            // Semester Genap (Mulai 1 Januari)
+            $startPeriod = Carbon::create($currentYear, 1, 1)->startOfDay();
+        }
+
+        // 2. Tentukan Tanggal Mulai Hitung (Untuk Siswa Baru)
+        $calculationStartDate = $startPeriod->clone();
+        if ($student->created_at && $student->created_at > $startPeriod) {
             $calculationStartDate = $student->created_at->startOfDay();
         }
 
+        // 3. Hitung Hari Sekolah (Senin-Sabtu) sampai Hari Ini
         $schoolDays = 0;
         $dateIterator = $calculationStartDate->clone();
         while ($dateIterator <= $today) {
@@ -215,19 +212,21 @@ class AttendanceController extends Controller
             $dateIterator->addDay();
         }
 
-        $monthlyAttendances = $student->attendances()
-            ->whereBetween('recorded_at', [$startOfMonth, $today->endOfDay()])
+        // 4. Hitung Hadir (Semester Ini)
+        $semesterAttendances = $student->attendances()
+            ->whereBetween('recorded_at', [$startPeriod, $today->endOfDay()])
             ->get();
 
-        $hadirCount = $monthlyAttendances->where('status', 'in')
+        $hadirCount = $semesterAttendances->where('status', 'in')
             ->unique(fn($i) => $i->recorded_at->format('Y-m-d'))
             ->count();
 
+        // 5. Hitung Izin/Sakit (Semester Ini)
         $permits = $student->absencePermits()
             ->where('status', 'disetujui')
-            ->where(function($q) use ($startOfMonth, $today) {
+            ->where(function($q) use ($startPeriod, $today) {
                  $q->whereDate('start_date', '<=', $today)
-                   ->whereDate('end_date', '>=', $startOfMonth);
+                   ->whereDate('end_date', '>=', $startPeriod);
             })->get();
 
         $permitDays = 0;
@@ -241,15 +240,18 @@ class AttendanceController extends Controller
             $start = Carbon::parse($permit->start_date);
             $end = Carbon::parse($permit->end_date);
 
-            if ($start < $startOfMonth) $start = $startOfMonth;
+            // Batasi perhitungan agar tidak keluar dari semester ini
+            if ($start < $startPeriod) $start = $startPeriod;
             if ($end > $today) $end = $today;
 
             $diff = $start->diffInDays($end) + 1;
             $permitDays += $diff;
         }
 
+        // 6. Hitung Alpa
         $alpaCount = max(0, $schoolDays - $hadirCount - $permitDays);
 
+        // 7. Riwayat Terakhir
         $history = $student->attendances()
             ->latest()
             ->take(5)

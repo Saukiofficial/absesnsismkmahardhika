@@ -102,7 +102,7 @@
                 Data Absensi
             </h2>
 
-            <!-- UPDATE: Tombol Export Aktif -->
+            <!-- Tombol Export Aktif -->
             <form action="{{ route('admin.attendances.export') }}" method="GET">
                  <!-- Kirimkan filter saat ini agar export sesuai dengan tampilan tabel -->
                  <input type="hidden" name="start_date" value="{{ request('start_date') }}">
@@ -169,16 +169,24 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-center whitespace-nowrap">
-                                @if(isset($attendance['status_in']) && $attendance['status_in'] == 'Terlambat')
+                                {{-- Logika Badge Status --}}
+                                @if(isset($attendance['keterangan']) && ($attendance['keterangan'] == 'Izin' || $attendance['keterangan'] == 'Sakit'))
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-100">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                        {{ $attendance['keterangan'] }}
+                                    </span>
+                                @elseif(isset($attendance['status_in']) && $attendance['status_in'] == 'Terlambat')
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-100">
                                         <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                         Terlambat
                                     </span>
-                                @else
+                                @elseif($attendance['check_in'])
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                         Tepat Waktu
                                     </span>
+                                @else
+                                    <span class="text-slate-400 font-medium">-</span>
                                 @endif
                             </td>
                         </tr>
@@ -237,8 +245,8 @@
 
     <!-- Content Sidebar -->
     <div class="flex-1 overflow-y-auto p-6 bg-slate-50">
-        <!-- Statistik Bulan Ini -->
-        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Statistik Bulan Ini</h4>
+        <!-- Statistik Semester Ini -->
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Statistik Semester Ini</h4>
         <div class="grid grid-cols-2 gap-3 mb-6">
             <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
                 <div class="text-slate-500 text-xs font-medium mb-1">Hadir</div>
@@ -354,10 +362,16 @@
                 document.getElementById('sidebarNis').innerText = 'NIS: ' + data.nis;
                 document.getElementById('sidebarClass').innerText = data.class;
 
-                // Handle Foto
+                // Handle Foto dengan Fallback yang aman
                 if (data.photo) {
                     const img = document.getElementById('sidebarPhoto');
                     img.src = data.photo;
+
+                    // Fallback jika gambar rusak (misal salah path storage)
+                    img.onerror = function() {
+                        this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=random`;
+                    };
+
                     img.classList.remove('hidden');
                     document.getElementById('sidebarInitial').classList.add('hidden');
                 } else {
@@ -386,7 +400,7 @@
                                         <span class="text-[10px] uppercase text-slate-400 font-bold">${item.date.split(' ')[1].substring(0,3)}</span>
                                     </div>
                                     <div>
-                                        <div class="text-sm font-bold text-slate-700">${item.status === 'Masuk' ? 'Absen Masuk' : 'Absen Pulang'}</div>
+                                        <div class="text-sm font-bold text-slate-700">${item.status_label}</div>
                                         <div class="text-xs text-slate-400 font-medium">${item.time} WIB</div>
                                     </div>
                                 </div>

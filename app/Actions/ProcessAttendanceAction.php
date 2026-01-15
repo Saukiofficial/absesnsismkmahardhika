@@ -36,7 +36,6 @@ class ProcessAttendanceAction
 
             $now = now();
 
-
             $isLate = false;
             if ($status === 'in' && $now->format('H:i:s') > self::LATE_BOUNDARY) {
                 $isLate = true;
@@ -52,14 +51,12 @@ class ProcessAttendanceAction
             ]);
             Log::info('Attendance record created for: ' . $student->name);
 
-
             try {
                 broadcast(new NewAttendance($student, $attendance, $isLate));
                 Log::info('Broadcast event success for user: ' . $student->name);
             } catch (\Exception $e) {
                 Log::error('Pusher broadcast failed: ' . $e->getMessage());
             }
-
 
             if ($student->guardian && $student->guardian->guardian_phone) {
                 Log::info('Guardian found with phone number.', ['guardian_name' => $student->guardian->name]);
@@ -69,7 +66,6 @@ class ProcessAttendanceAction
                 $message = "";
 
                 if ($status === 'out') {
-
                     $message = "Halo Bapak/Ibu Wali Murid 😊\n" .
                                "Kami dari SMK Mahardhika menginformasikan bahwa:\n\n" .
                                "*{$studentName}*, kelas {$studentClass},\n" .
@@ -77,9 +73,7 @@ class ProcessAttendanceAction
                                "Pesan ini dikirim otomatis sebagai bentuk transparansi dan pemantauan kehadiran siswa secara real-time!\n\n" .
                                "Terima kasih, semoga anak - anak selamat sampai rumah dan kembali bertemu dengan keluarga";
                 } else {
-
                     if ($isLate) {
-
                         $message = "Halo Bapak/Ibu Wali Murid 😊\n" .
                                    "Kami dari SMK Mahardhika menginformasikan bahwa:\n\n" .
                                    "*{$studentName}*, kelas {$studentClass},\n" .
@@ -87,7 +81,6 @@ class ProcessAttendanceAction
                                    "Pesan ini dikirim otomatis sebagai bentuk transparansi dan pemantauan kehadiran siswa secara real-time!\n\n" .
                                    "Terima kasih, semoga kedepannya bisa lebih disiplin waktu";
                     } else {
-
                         $message = "Halo Bapak/Ibu Wali Murid 😊\n" .
                                    "Kami dari SMK Mahardhika menginformasikan bahwa:\n\n" .
                                    "*{$studentName}*, kelas {$studentClass},\n" .
@@ -105,13 +98,28 @@ class ProcessAttendanceAction
                 ]);
             }
 
+            // ✅ PERBAIKAN: Generate URL foto dengan benar
+            $photoUrl = null;
+
+            if ($student->photo) {
+                // Cek apakah foto sudah full URL
+                if (filter_var($student->photo, FILTER_VALIDATE_URL)) {
+                    $photoUrl = $student->photo;
+                } else {
+                    // Generate full URL menggunakan asset()
+                    $photoUrl = asset('storage/' . $student->photo);
+                }
+            } else {
+                // Fallback ke placeholder
+                $photoUrl = 'https://ui-avatars.com/api/?name=' . urlencode($student->name) . '&size=200&background=3b82f6&color=fff&bold=true';
+            }
 
             $responseData = [
                 'student_name' => $student->name,
                 'class'        => $student->class ?? 'N/A',
                 'status'       => $attendance->status,
                 'time'         => $attendance->recorded_at->format('H:i:s'),
-                'photo_url'    => $student->photo_url ?? 'https://placehold.co/128x128/0f0f23/64e5e5?text=' . substr($student->name, 0, 1),
+                'photo_url'    => $photoUrl, // ✅ Gunakan variable yang sudah di-generate
                 'is_late'      => $isLate,
             ];
 

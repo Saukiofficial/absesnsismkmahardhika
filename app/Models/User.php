@@ -53,6 +53,29 @@ class User extends Authenticatable
     ];
 
     /**
+     * ✅ ACCESSOR: Generate full URL untuk foto
+     * Accessor ini membuat kita bisa memanggil $user->photo_url
+     *
+     * @return string
+     */
+    public function getPhotoUrlAttribute()
+    {
+        if ($this->photo) {
+            // Jika foto sudah berupa full URL (http/https)
+            if (filter_var($this->photo, FILTER_VALIDATE_URL)) {
+                return $this->photo;
+            }
+
+            // Generate full URL dari path relatif
+            // Contoh: photos/student.jpg -> http://localhost/storage/photos/student.jpg
+            return asset('storage/' . $this->photo);
+        }
+
+        // Fallback: Jika tidak ada foto, gunakan UI Avatars
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&size=200&background=3b82f6&color=fff&bold=true';
+    }
+
+    /**
      * PENTING: Fungsi ini memperbaiki error "Call to undefined method hasRole"
      * Cek apakah user memiliki role tertentu.
      */
