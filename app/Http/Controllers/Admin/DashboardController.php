@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\User;
-use App\Models\AbsencePermit; // Pastikan Model ini ada dan benar
+use App\Models\AbsencePermit;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -15,92 +15,92 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        // --- 1. CARD: Total Siswa ---
+        // --- 1. DATA GLOBAL (Selalu Ada) ---
+        // Total Siswa Aktif
         $totalStudents = User::where('role', 'siswa')->count();
+        // Ambil semua ID siswa untuk perhitungan Alpa nanti
         $allStudentIds = User::where('role', 'siswa')->pluck('id');
 
-        // --- PERBAIKAN: BLOK LOGIKA HARI MINGGU ---
+        // Inisialisasi variabel agar tidak error "Undefined Variable"
+        $presentCount = 0;
+        $izinHariIni = 0;
+        $absentCount = 0;
+        $lateCount = 0;
+        $latestAttendances = collect();
+        $pendingPermissions = collect();
+        $approvedPermitsToday = collect();
+        $alpaStudentsToday = collect();
+
+        // --- 2. LOGIKA HARI ---
         if ($today->dayOfWeek === Carbon::SUNDAY) {
-            // Jika hari ini Minggu, set semua data operasional ke 0 atau kosong
-            $presentCount = 0;
-            $izinHariIni = 0;
-            $absentCount = 0;
-            $lateCount = 0;
-            $latestAttendances = collect();
-            $pendingPermissions = collect();
-
-            // Variabel baru
-            $approvedPermitsToday = collect(); // Kosongkan daftar izin
-            $alpaStudentsToday = collect(); // Kosongkan daftar alpa
-
+            // HARI MINGGU: Biarkan semua data operasional tetap 0 / kosong
+            // Tidak perlu coding tambahan karena variabel sudah di-init di atas
         } else {
-            // --- Logika Hari Normal (Senin - Sabtu) ---
+            // HARI KERJA (Senin - Sabtu)
 
-            // 2. CARD: Hadir Hari Ini
-            $presentStudentIds = Attendance::whereDate('recorded_at', $today)
+            // A. DATA KEHADIRAN (Hadir & Terlambat)
+            // Ambil data absensi hari ini (status 'in')
+            $attendancesToday = Attendance::with('user')
+                ->whereDate('recorded_at', $today)
                 ->where('status', 'in')
-                ->distinct('user_id')
-                ->pluck('user_id');
+                ->get();
+
+            // Hitung Jumlah Hadir (Unique user_id)
+            $presentStudentIds = $attendancesToday->pluck('user_id')->unique();
             $presentCount = $presentStudentIds->count();
 
-            // 3. CARD: Izin Hari Ini (Termasuk Pending)
-            $onLeaveStudentIds = AbsencePermit::whereIn('status', ['disetujui', 'diajukan', 'pending'])
-                            ->whereDate('start_date', '<=', $today)
-                            ->whereDate('end_date', '>=', $today)
-                            ->distinct('user_id')
-                            ->pluck('user_id');
-            $izinHariIni = $onLeaveStudentIds->count();
+            // Hitung Terlambat (Contoh: Lewat jam 07:00:00)
+            $lateCount = $attendancesToday->filter(function ($att) {
+                // Pastikan format jam sesuai dengan setting sekolah Anda
+                return Carbon::parse($att->recorded_at)->format('H:i:s') > '07:00:00';
+            })->count();
 
-            // 4. CARD: Siswa Alpa / Belum Hadir
-            // Siswa yang hadir ATAU izin
-            $excusedStudentIds = $presentStudentIds->merge($onLeaveStudentIds)->unique();
-            $absentCount = $totalStudents - $excusedStudentIds->count();
-
-            // 5. CARD: Terlambat (Batas 06:30)
-            $lateBoundary = '06:30:00';
-            $lateCount = Attendance::whereIn('user_id', $presentStudentIds)
-                ->where('status', 'in')
-                ->whereTime('recorded_at', '>', $lateBoundary)
-                ->distinct('user_id')
-                ->count();
-
-            // 6. TABEL: Aktivitas Absensi Terakhir
+            // Data Absensi Terbaru untuk Widget
             $latestAttendances = Attendance::with('user')
-                ->whereDate('recorded_at', $today) // Hanya tampilkan aktivitas hari ini
+                ->whereDate('recorded_at', $today)
                 ->latest('recorded_at')
                 ->take(5)
                 ->get();
 
-            // 7. TABEL: Permintaan Izin Baru (Pending)
-            $pendingPermissions = AbsencePermit::with('student')
-                ->whereIn('status', ['diajukan', 'pending'])
-                ->orderBy('created_at', 'desc')
-                ->take(5)
-                ->get();
-
-            // --- 8. LOGIKA BARU: TABEL Aktivitas Izin (Disetujui) ---
-            $approvedPermitsToday = AbsencePermit::with('student')
+            // B. DATA IZIN / SAKIT (Disetujui & Aktif Hari Ini)
+            $approvedPermitsToday = AbsencePermit::with('student') // Pastikan relasi 'student' ada di Model AbsencePermit
                 ->where('status', 'disetujui')
                 ->whereDate('start_date', '<=', $today)
                 ->whereDate('end_date', '>=', $today)
                 ->get();
 
-            // --- 9. LOGIKA BARU: TABEL Aktivitas Alpa ---
+            $permitStudentIds = $approvedPermitsToday->pluck('user_id')->unique();
+            $izinHariIni = $permitStudentIds->count();
+
+            // C. DATA ALPA (Tidak Hadir & Tidak Izin)
+            // Gabungkan ID siswa yang Hadir dan Izin untuk pengecualian
+            $excusedStudentIds = $presentStudentIds->merge($permitStudentIds)->unique();
+
+            // PERBAIKAN UTAMA: Definisi variable $excusedStudentIds sebelum dipakai diff()
             $alpaStudentIds = $allStudentIds->diff($excusedStudentIds);
+
+            // Ambil data detail siswa yang Alpa
             $alpaStudentsToday = User::whereIn('id', $alpaStudentIds)->get(['id', 'name', 'class']);
+            $absentCount = $alpaStudentsToday->count();
+
+            // D. Permintaan Izin Baru (Pending) - Widget Notifikasi
+            $pendingPermissions = AbsencePermit::with('student')
+                ->whereIn('status', ['diajukan', 'pending'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
         }
-        // --- AKHIR PERBAIKAN ---
 
         return view('admin.dashboard', compact(
             'totalStudents',
             'presentCount',
-            'absentCount',
+            'absentCount', // Jumlah Alpa
             'lateCount',
+            'izinHariIni', // Jumlah Izin
             'latestAttendances',
-            'izinHariIni',
             'pendingPermissions',
-            'approvedPermitsToday', // Kirim data baru
-            'alpaStudentsToday'     // Kirim data baru
+            'approvedPermitsToday', // List Detail Izin
+            'alpaStudentsToday'     // List Detail Alpa
         ));
     }
 }

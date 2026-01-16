@@ -26,11 +26,20 @@ class AbsencePermit extends Model
     ];
 
     /**
-     * Relasi ke User (Siswa)
-     * Fungsi ini WAJIB ADA agar tidak error saat export data izin
+     * Relasi ke User (Siswa) - Default Laravel biasanya 'user'
      */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Alias Relasi: 'student'
+     * Menambahkan ini agar pemanggilan $permit->student->name tidak error
+     * Berguna jika di view atau controller menggunakan kata 'student'
+     */
+    public function student()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
