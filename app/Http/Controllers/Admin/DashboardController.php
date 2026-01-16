@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\User;
 use App\Models\AbsencePermit;
+use App\Models\Holiday; // 1. JANGAN LUPA IMPORT MODEL HOLIDAY
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -31,12 +32,19 @@ class DashboardController extends Controller
         $approvedPermitsToday = collect();
         $alpaStudentsToday = collect();
 
-        // --- 2. LOGIKA HARI ---
-        if ($today->dayOfWeek === Carbon::SUNDAY) {
-            // HARI MINGGU: Biarkan semua data operasional tetap 0 / kosong
-            // Tidak perlu coding tambahan karena variabel sudah di-init di atas
+        // --- 2. CEK HARI LIBUR ---
+        // Cek apakah tanggal hari ini ada di tabel 'holidays'
+        $isHoliday = Holiday::whereDate('holiday_date', $today)->exists();
+
+        // --- 3. LOGIKA HARI ---
+        // Jika Hari Minggu ATAU Hari ini terdaftar sebagai Libur di database
+        if ($today->dayOfWeek === Carbon::SUNDAY || $isHoliday) {
+            // HARI LIBUR:
+            // Biarkan semua data operasional tetap 0 / kosong.
+            // Dengan begini, sistem TIDAK AKAN menghitung Alpa (absentCount tetap 0).
+
         } else {
-            // HARI KERJA (Senin - Sabtu)
+            // HARI KERJA (Senin - Sabtu & Bukan Tanggal Merah)
 
             // A. DATA KEHADIRAN (Hadir & Terlambat)
             // Ambil data absensi hari ini (status 'in')
